@@ -30,6 +30,26 @@ async function addElement() {
     console.log(galleryContainer);
 }
 
+function newFilters() {
+    let portfolioContainer = document.getElementById("portfolio");
+    const buttonContainer = document.createElement("div");
+    const listCategories = new Set();
+    
+    for (let i=0; i<galleryItems.length; i++) {
+        listCategories.add(galleryItems[i].category.name);
+        listCategories.add("Tous");
+    }
+
+    listCategories.forEach(category => {
+        const buttonFilters = document.createElement("button");
+        buttonFilters.textContent = category;
+
+        buttonContainer.appendChild(buttonFilters);
+    })
+    
+    portfolioContainer.appendChild(buttonContainer);
+}
+
  /* 
     Attention il faut appeler addElement après fetchWorks :
         1- on appelle fetchWorks
@@ -38,6 +58,7 @@ async function addElement() {
 */
 fetchWorks().then(() => {
     addElement();
+    newFilters();
 });
 
 
