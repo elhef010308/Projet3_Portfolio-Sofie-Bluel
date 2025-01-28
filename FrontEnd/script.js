@@ -1,4 +1,5 @@
 const galleryContainer = document.querySelector(".gallery");
+const mainContainer = document.querySelector("main");
 let galleryItems= [];
 
 async function fetchWorks() {
@@ -71,6 +72,59 @@ async function filterByCategories(category) {
     addElement(filteredItems);
 }
 
+async function createLoginPage() { 
+    mainContainer.innerHTML = '';
+
+    mainContainer.innerHTML = `
+        <div class="container-login-page">
+            <h2>Log In</h2>
+            <div class="input-field" aria-label="Page de connexion">
+                <p class="e-mail">E-mail</p>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    title="Veuillez indiquer votre adresse mail"
+                    required
+                    aria-required="true"
+                />
+                <p class="password">Mot de passe</p>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    title="Veuillez saisir votre mot de passe"
+                    required
+                    aria-required="true"
+                />
+            </div>
+            <button type="submit">
+                Se connecter
+            </button>
+            <a href="#" class="forgotPasswordLink">
+                Mot de passe oublié
+            </a>
+        </div>
+    `;
+}
+
+async function setButtonListener() {
+    const listItems = document.querySelectorAll("li");
+    let initialContent = mainContainer.innerHTML;
+
+    // Sélectionner le 3ème élément de la liste (index 2)
+    const buttonLogin = listItems[2];
+    const buttonProjet = listItems[0];
+
+    buttonLogin.addEventListener("click", () => {
+        createLoginPage();
+    });
+
+    buttonProjet.addEventListener("click", () => {
+        mainContainer.innerHTML = initialContent;
+    });
+}
+
  /* 
     Attention il faut appeler addElement après fetchWorks :
         1- on appelle fetchWorks
@@ -80,6 +134,7 @@ async function filterByCategories(category) {
 fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
+    setButtonListener();
 });
 
 
