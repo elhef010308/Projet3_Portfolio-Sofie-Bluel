@@ -2,6 +2,7 @@ const galleryContainer = document.querySelector(".gallery");
 const mainContainer = document.querySelector("main");
 let galleryItems= [];
 
+// fonction pour récupérer les données de l'API
 async function fetchWorks() {
     const reponse = await fetch("http://localhost:5678/api/works");
     galleryItems = await reponse.json();
@@ -11,6 +12,7 @@ async function fetchWorks() {
     console.log(galleryContainer);
 } 
 
+// fonction pour vider la galerie et insérer les données de l'API à la place
 async function addElement(itemsToDisplay) {
     galleryContainer.innerHTML = '';
     
@@ -33,12 +35,17 @@ async function addElement(itemsToDisplay) {
     console.log(galleryContainer);
 }
 
+
+// fonction pour créer des boutons de filtres
 async function newFilters() {
     let portfolioContainer = document.getElementById("portfolio")
     const titleGlobalPage = document.querySelectorAll("h2");
     const titlePortfolioContainer = titleGlobalPage[1];
+    titlePortfolioContainer.setAttribute("class", "title-portfolio");
+
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "list-buttons-filters";
+
     const listCategories = new Set();
 
     listCategories.add("Tous");
@@ -47,10 +54,10 @@ async function newFilters() {
         listCategories.add(galleryItems[i].category.name);
     }
     
-
     listCategories.forEach(category => {
         const buttonFilters = document.createElement("button");
         buttonFilters.textContent = category;
+        buttonFilters.setAttribute("class", "buttons-to-filter")
 
         // Lier un événement au clic sur chaque bouton
         buttonFilters.addEventListener("click", () => {
@@ -63,6 +70,8 @@ async function newFilters() {
     portfolioContainer.insertBefore(buttonContainer, titlePortfolioContainer.nextElementSibling);
 }
 
+
+// fonction pour trier la galerie en fonction du clic sur les boutons
 async function filterByCategories(category) {
     let filteredItems = [];
 
@@ -75,6 +84,7 @@ async function filterByCategories(category) {
     addElement(filteredItems);
 }
 
+// fonction pour créer la page de connexion
 async function createLoginPage() { 
     mainContainer.innerHTML = '';
 
@@ -111,11 +121,13 @@ async function createLoginPage() {
     `;
 }
 
+// fonction pour afficher la page de connexion
+// fonction pour revenir à la page d'accueil du site
 async function setButtonListener() {
     const listItemsLi = document.querySelectorAll("li");
     let initialContent = mainContainer.innerHTML;
 
-    // Sélectionner le 3ème élément de la liste (index 2)
+    // Sélectionner l'élément en fonction de son index
     const buttonLogin = listItemsLi[2];
     const buttonProjet = listItemsLi[0];
 
@@ -128,6 +140,115 @@ async function setButtonListener() {
     });
 }
 
+// fonction pour ajouter du style CSS aux nouveaux éléments insérés via Javascript
+async function globalStyle () {
+    const baliseStyle = document.createElement("style");
+
+    baliseStyle.innerHTML = ` 
+        body {
+            background-color:#FFFEF8;
+        }
+
+        .title-portfolio {
+            margin:139px 0 0 0;
+        }
+
+        .list-buttons-filters {
+            display:flex;
+            justify-content:center;
+            margin: 50px 0;
+        }
+
+        .buttons-to-filter {
+            height:38px;
+            size:16px;
+            font-weight:700;
+            border: solid 2px #1D6154;
+            border-radius:50px;
+            background-color:white;
+            color:#1D6154;
+            font-family:Syne;
+        }
+
+        .buttons-to-filter:nth-child(1) {
+            width:100px;
+            margin:0 10px 0 0;
+        }
+        
+        .buttons-to-filter:nth-child(2) {
+            width:100px;
+            margin:0 10px 0 0;
+        } 
+        
+        .buttons-to-filter:nth-child(3) {
+            width:157px;
+            margin:0 10px 0 0;
+        }
+
+        .buttons-to-filter:nth-child(4) {
+            width:198px;
+        } 
+
+        .buttons-to-filter:hover {
+            background-color:#1D6154;
+            color:white;
+        }
+
+        .buttons-to-filter:focus {
+            background-color:#1D6154;
+            color:white;
+        }
+
+        .container-login-page {
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            flex-direction:column;
+        }
+
+        .container-login-page h2 {
+            margin:150px 0 37px 0;
+        }
+
+        .container-login-page button {
+            height:36px;
+            width:179px;
+            size:16px;
+            font-family:Syne;
+            font-weight:700;
+            border: solid 2px #1D6154;
+            border-radius:50px;
+            background-color: #1D6154;
+            color:white;
+            font-family:Syne;
+            margin: 15px 0 28px 0;
+        }
+
+        .container-login-page button:hover {
+            background-color:white;
+            color:#1D6154;
+        }
+
+        .input-field input {
+            margin:22px 0;
+            width:379px;
+            height:51px;
+            border: none;
+            border-radius: 2px;
+            background-color:white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre subtile */
+            outline: none; /* Empêche la bordure bleue par défaut au focus */
+        }
+
+        .forgotPasswordLink {
+            color:black;
+            margin: 0 0 355px 0;
+        }       
+    `;
+    
+    document.head.appendChild(baliseStyle); 
+}
+
  /* 
     Attention il faut appeler addElement après fetchWorks :
         1- on appelle fetchWorks
@@ -138,6 +259,7 @@ fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
+    globalStyle ();
 });
 
 
