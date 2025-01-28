@@ -34,16 +34,19 @@ async function addElement(itemsToDisplay) {
 }
 
 async function newFilters() {
-    let portfolioContainer = document.getElementById("portfolio");
+    let portfolioContainer = document.getElementById("portfolio")
+    const titleGlobalPage = document.querySelectorAll("h2");
+    const titlePortfolioContainer = titleGlobalPage[1];
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "list-buttons-filters";
     const listCategories = new Set();
+
+    listCategories.add("Tous");
     
     for (let i=0; i<galleryItems.length; i++) {
         listCategories.add(galleryItems[i].category.name);
     }
     
-    listCategories.add("Tous");
 
     listCategories.forEach(category => {
         const buttonFilters = document.createElement("button");
@@ -57,7 +60,7 @@ async function newFilters() {
         buttonContainer.appendChild(buttonFilters);
     });
     
-    portfolioContainer.appendChild(buttonContainer);
+    portfolioContainer.insertBefore(buttonContainer, titlePortfolioContainer.nextElementSibling);
 }
 
 async function filterByCategories(category) {
@@ -109,12 +112,12 @@ async function createLoginPage() {
 }
 
 async function setButtonListener() {
-    const listItems = document.querySelectorAll("li");
+    const listItemsLi = document.querySelectorAll("li");
     let initialContent = mainContainer.innerHTML;
 
     // Sélectionner le 3ème élément de la liste (index 2)
-    const buttonLogin = listItems[2];
-    const buttonProjet = listItems[0];
+    const buttonLogin = listItemsLi[2];
+    const buttonProjet = listItemsLi[0];
 
     buttonLogin.addEventListener("click", () => {
         createLoginPage();
