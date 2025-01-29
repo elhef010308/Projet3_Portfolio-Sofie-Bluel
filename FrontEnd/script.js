@@ -89,7 +89,7 @@ async function createLoginPage() {
     mainContainer.innerHTML = '';
 
     mainContainer.innerHTML = `
-        <div class="container-login-page">
+        <form class="container-login-page">
             <h2>Log In</h2>
             <div class="input-field" aria-label="Page de connexion">
                 <p class="e-mail">E-mail</p>
@@ -114,10 +114,10 @@ async function createLoginPage() {
             <button type="submit">
                 Se connecter
             </button>
-            <a href="#" class="forgotPasswordLink">
+            <a href="#" class="forgot-password-link">
                 Mot de passe oublié
             </a>
-        </div>
+        </form>
     `;
 }
 
@@ -140,11 +140,46 @@ async function setButtonListener() {
     });
 }
 
+// fonction pour récupérer les données du formulaire de connexion
+async function formResponse () {
+    const formContainer = document.querySelector(".container-login-page");
+    let emailUsers = document.getElementById("email");
+    let passwordUsers = document.getElementById("password");
+    
+    formContainer.addEventListener("submit", (event) => {
+        event.preventDefault();  // empêcher le rechargement de la page
+        
+        // création de l'objet contenant les données à envoyer
+        let usersData = {
+            email: emailUsers.value, 
+            password: passwordUsers.value
+        };
+        
+        fetch("http://localhost:5678/api/users/login", {
+            method: "POST",
+            headers: {"Content-Type" : "application/json"},
+            body: JSON.stringify(usersData)
+        })
+
+        // convertir la réponse serveur en objet
+        .then (response => {
+            let serverResponseConversion = response.json();
+            return serverResponseConversion;
+        })
+        
+        // afficher les données reçues dans la console
+        .then (data => {console.log("Réponse du serveur :", data);})
+
+        // gérer les erreurs
+        .catch (error => console.error("Erreur :", error));
+    })
+}
+
 // fonction pour ajouter du style CSS aux nouveaux éléments insérés via Javascript
 async function globalStyle () {
-    const baliseStyle = document.createElement("style");
+    const baliseStyle2 = document.createElement("style");
 
-    baliseStyle.innerHTML = ` 
+    baliseStyle2.innerHTML = ` 
         body {
             background-color:#FFFEF8;
         }
@@ -240,13 +275,18 @@ async function globalStyle () {
             outline: none; /* Empêche la bordure bleue par défaut au focus */
         }
 
-        .forgotPasswordLink {
+        .forgot-password-link {
             color:black;
             margin: 0 0 355px 0;
-        }       
+            font-weight:300;
+        }   
+        
+        .forgot-password-link:hover, .forgot-password-link:focus {
+            color:#1D6154;
+        } 
     `;
     
-    document.head.appendChild(baliseStyle); 
+    document.head.appendChild(baliseStyle2); 
 }
 
  /* 
@@ -259,6 +299,7 @@ fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
+    formResponse ();
     globalStyle ();
 });
 
