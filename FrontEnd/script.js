@@ -1,6 +1,15 @@
+// gestion des variables globales
 const galleryContainer = document.querySelector(".gallery");
+
 const mainContainer = document.querySelector("main");
+
 let galleryItems= [];
+
+let portfolioContainer = document.getElementById("portfolio");
+const titleGlobalPage = document.querySelectorAll("h2");
+
+const titlePortfolioContainer = titleGlobalPage[1];
+titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
 // fonction pour récupérer les données de l'API
 async function fetchWorks() {
@@ -38,11 +47,6 @@ async function addElement(itemsToDisplay) {
 
 // fonction pour créer des boutons de filtres
 async function newFilters() {
-    let portfolioContainer = document.getElementById("portfolio")
-    const titleGlobalPage = document.querySelectorAll("h2");
-    const titlePortfolioContainer = titleGlobalPage[1];
-    titlePortfolioContainer.setAttribute("class", "title-portfolio");
-
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "list-buttons-filters";
 
@@ -289,6 +293,66 @@ async function globalStyle () {
     document.head.appendChild(baliseStyle2); 
 }
 
+async function createModalLink() {
+    // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
+    const modalLink = document.createElement("a");
+    modalLink.textContent = "modifier";
+    modalLink.setAttribute("id", "link-to-open-modal");
+    modalLink.setAttribute("href", "#modal-container");
+
+    const iconeLink1 = document.createElement("link");
+    iconeLink1.setAttribute("rel", "stylesheet");
+    iconeLink1.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+    document.head.appendChild(iconeLink1);
+
+    const iconeModalLink = document.createElement("i");
+    iconeModalLink.setAttribute("class", "fa-regular fa-pen-to-square");
+
+    // ÉTAPE 2 : créer une div contenant l'icone et le lien 
+    const iconeLinkContainer = document.createElement("div");
+    iconeLinkContainer.setAttribute("class", "icone-link-container");
+
+    iconeLinkContainer.appendChild(iconeModalLink);
+    iconeLinkContainer.appendChild(modalLink);
+
+    // ÉTAPE 3 : créer une div pour contenir la div du lien et le titre de la section portfolio
+    const modalLinkContainer = document.createElement("div");
+    modalLinkContainer.setAttribute("class", "container-modalLink");
+
+    // ÉTAPE 4 : ajouter le lien et le titre dans la div
+    modalLinkContainer.appendChild(titlePortfolioContainer);
+    modalLinkContainer.appendChild(iconeLinkContainer);
+
+    // ÉTAPE 5 : insérer le lien au début de la section portfolio
+    const buttonContainer = document.querySelector(".list-buttons-filters");
+    portfolioContainer.insertBefore(modalLinkContainer, buttonContainer);
+
+    // ÉTAPE 6 : ajouter le style CSS
+    titlePortfolioContainer.style.display = "flex";
+    titlePortfolioContainer.style.alignItems = "center";
+    titlePortfolioContainer.style.margin = "50px 0 0 0";            // Réinitialiser les marges
+    titlePortfolioContainer.style.padding = "0";                    // Réinitialiser les paddings
+    
+    modalLink.style.color = "black";
+    modalLink.style.textDecoration = "none";
+    modalLink.style.fontSize = "14px";
+
+    iconeLinkContainer.style.display = "flex";
+    iconeLinkContainer.style.alignItems = "center"; 
+    iconeLinkContainer.style.justifyContent = "center";
+    iconeLinkContainer.style.gap = "10px";
+    iconeLinkContainer.style.width = "85px";
+    iconeLinkContainer.style.height = "18px";
+    iconeLinkContainer.style.margin = "50px 0 0 0";
+    iconeLinkContainer.style.gap = "15px";
+
+    modalLinkContainer.style.display = "flex";
+    modalLinkContainer.style.alignItems = "center"; 
+    modalLinkContainer.style.justifyContent = "center";
+    modalLinkContainer.style.gap = "30px";
+}
+
+
  /* 
     Attention il faut appeler addElement après fetchWorks :
         1- on appelle fetchWorks
@@ -301,6 +365,7 @@ fetchWorks().then(() => {
     setButtonListener();
     formResponse ();
     globalStyle ();
+    createModalLink();
 });
 
 
