@@ -2,6 +2,7 @@
 const galleryContainer = document.querySelector(".gallery");
 
 const mainContainer = document.querySelector("main");
+const formContainer = document.getElementById("login-container");
 
 let galleryItems= [];
 
@@ -27,6 +28,7 @@ async function addElement(itemsToDisplay) {
     
     for (let i=0; i<itemsToDisplay.length; i++) {
         const figureContainer = document.createElement("figure");
+        figureContainer.setAttribute("class", "img-in-gallery");
 
         const baliseImage = document.createElement("img");
         baliseImage.setAttribute("alt", itemsToDisplay[i].title);
@@ -88,43 +90,6 @@ async function filterByCategories(category) {
     addElement(filteredItems);
 }
 
-// fonction pour créer la page de connexion
-async function createLoginPage() { 
-    mainContainer.innerHTML = '';
-
-    mainContainer.innerHTML = `
-        <form class="container-login-page">
-            <h2>Log In</h2>
-            <div class="input-field" aria-label="Page de connexion">
-                <p class="e-mail">E-mail</p>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    title="Veuillez indiquer votre adresse mail"
-                    required
-                    aria-required="true"
-                />
-                <p class="password">Mot de passe</p>
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    title="Veuillez saisir votre mot de passe"
-                    required
-                    aria-required="true"
-                />
-            </div>
-            <button type="submit">
-                Se connecter
-            </button>
-            <a href="#" class="forgot-password-link">
-                Mot de passe oublié
-            </a>
-        </form>
-    `;
-}
-
 // fonction pour afficher la page de connexion
 // fonction pour revenir à la page d'accueil du site
 async function setButtonListener() {
@@ -136,11 +101,13 @@ async function setButtonListener() {
     const buttonProjet = listItemsLi[0];
 
     buttonLogin.addEventListener("click", () => {
-        createLoginPage();
+        formContainer.classList.remove("hidden");
+        mainContainer.classList.add("hidden");
     });
 
     buttonProjet.addEventListener("click", () => {
-        mainContainer.innerHTML = initialContent;
+        formContainer.classList.add("hidden");
+        mainContainer.classList.remove("hidden");
     });
 }
 
@@ -179,126 +146,14 @@ async function formResponse () {
     })
 }
 
-// fonction pour ajouter du style CSS aux nouveaux éléments insérés via Javascript
-async function globalStyle () {
-    const baliseStyle2 = document.createElement("style");
-
-    baliseStyle2.innerHTML = ` 
-        body {
-            background-color:#FFFEF8;
-        }
-
-        .title-portfolio {
-            margin:139px 0 0 0;
-        }
-
-        .list-buttons-filters {
-            display:flex;
-            justify-content:center;
-            margin: 50px 0;
-        }
-
-        .buttons-to-filter {
-            height:38px;
-            size:16px;
-            font-weight:700;
-            border: solid 2px #1D6154;
-            border-radius:50px;
-            background-color:white;
-            color:#1D6154;
-            font-family:Syne;
-        }
-
-        .buttons-to-filter:nth-child(1) {
-            width:100px;
-            margin:0 10px 0 0;
-        }
-        
-        .buttons-to-filter:nth-child(2) {
-            width:100px;
-            margin:0 10px 0 0;
-        } 
-        
-        .buttons-to-filter:nth-child(3) {
-            width:157px;
-            margin:0 10px 0 0;
-        }
-
-        .buttons-to-filter:nth-child(4) {
-            width:198px;
-        } 
-
-        .buttons-to-filter:hover {
-            background-color:#1D6154;
-            color:white;
-        }
-
-        .buttons-to-filter:focus {
-            background-color:#1D6154;
-            color:white;
-        }
-
-        .container-login-page {
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            flex-direction:column;
-        }
-
-        .container-login-page h2 {
-            margin:150px 0 37px 0;
-        }
-
-        .container-login-page button {
-            height:36px;
-            width:179px;
-            size:16px;
-            font-family:Syne;
-            font-weight:700;
-            border: solid 2px #1D6154;
-            border-radius:50px;
-            background-color: #1D6154;
-            color:white;
-            font-family:Syne;
-            margin: 15px 0 28px 0;
-        }
-
-        .container-login-page button:hover {
-            background-color:white;
-            color:#1D6154;
-        }
-
-        .input-field input {
-            margin:22px 0;
-            width:379px;
-            height:51px;
-            border: none;
-            border-radius: 2px;
-            background-color:white;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre subtile */
-            outline: none; /* Empêche la bordure bleue par défaut au focus */
-        }
-
-        .forgot-password-link {
-            color:black;
-            margin: 0 0 355px 0;
-            font-weight:300;
-        }   
-        
-        .forgot-password-link:hover, .forgot-password-link:focus {
-            color:#1D6154;
-        } 
-    `;
-    
-    document.head.appendChild(baliseStyle2); 
-}
-
-async function createModalLink() {
+// fonction pour créer le lien pur ouvrir la boite modale
+function createModalLink() {
     // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
     const modalLink = document.createElement("a");
     modalLink.textContent = "modifier";
     modalLink.setAttribute("id", "link-to-open-modal");
-    modalLink.setAttribute("href", "#modal-container");
+    modalLink.setAttribute("href", "#modal-box-container");
+    modalLink.setAttribute("class", "link-to-open-modal-box");
 
     const iconeLink1 = document.createElement("link");
     iconeLink1.setAttribute("rel", "stylesheet");
@@ -330,8 +185,8 @@ async function createModalLink() {
     // ÉTAPE 6 : ajouter le style CSS
     titlePortfolioContainer.style.display = "flex";
     titlePortfolioContainer.style.alignItems = "center";
-    titlePortfolioContainer.style.margin = "50px 0 0 0";            // Réinitialiser les marges
-    titlePortfolioContainer.style.padding = "0";                    // Réinitialiser les paddings
+    titlePortfolioContainer.style.margin = "50px 0 0 0";   
+    titlePortfolioContainer.style.padding = "0";            
     
     modalLink.style.color = "black";
     modalLink.style.textDecoration = "none";
@@ -352,8 +207,195 @@ async function createModalLink() {
     modalLinkContainer.style.gap = "30px";
 }
 
+// fonction pour créer le contenu de la boite modale
+function createModalBox() {
+    // Vérifier si la modale existe déjà (évite les doublons)
+    if (document.getElementById("container-modal-box")) return;
 
- /* 
+    document.body.insertAdjacentHTML("beforeend", `
+        <aside id="container-modal-box" class="modal-box-1" role="dialogue" aria-hidden="true" aria-labelledby="title-modal">
+            <div class="modal-container">    
+                <button class="button-close-modal">X</button>
+                <h3 class="title-modal">Galerie photo</h3>
+                <div class="container-pictures-modal"></div>
+                <svg class="lign-modal-box" width="420px" height="2px">
+                    <rect width="100%" height="1px" fill="black"></rect>
+                </svg>
+                <button class="button-add-pictures">Ajouter une photo</button>
+            </div>
+        </aside>
+    `);
+    
+    const modalBoxContainer = document.getElementById("container-modal-box");
+    const picturesContainerInModal = modalBoxContainer.querySelector(".container-pictures-modal");
+    const picturesInGallery = document.querySelectorAll(".img-in-gallery");
+
+    // vérifier si les images existent dans la gallerie et les cloner
+    if (picturesInGallery.length > 0) {
+        picturesInGallery.forEach(picture => {
+            const clonePisctures = picture.cloneNode(true);
+            picturesContainerInModal.appendChild(clonePisctures);
+        });
+    } else {
+        picturesContainerInModal.innerHTML = "<p>Aucune image trouvée</p>";
+    }
+
+    // ajouter le style CSS à la boite modale
+    const baliseStyle3 = document.createElement("style");
+
+    baliseStyle3.innerHTML = `
+        .modal-box-1 {
+            display: none; 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            align-items:center;
+            justify-content:center;
+            z-index:100;
+            background-color:white;
+            border-radius: 10px;
+            width: 630px;   
+            height: auto;    /* Ajuster la hauteur de la modale */
+        }
+
+        .modal-container {
+            position: relative;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .button-close-modal {
+            border:none;
+            top: 20px;
+            right: 20px;
+            background-color: transparent;
+            position: absolute;
+            font-size:18px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .container-pictures-modal {
+            width: 420.3px;
+            height:365.71px
+            gap: 9px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);  /* 5 colonnes */
+            justify-content: center;                /* Centre les colonnes horizontalement */
+            align-items: center;                    /* Centre les images verticalement */
+            margin: 0 auto;                         /* Centre le conteneur dans la modale */
+        }
+
+        .container-pictures-modal img {
+            width: 76.86px;
+            height: 102.57px;
+            object-fit: cover;
+            margin: 0 0 29px 0;
+        }
+
+        .container-pictures-modal figcaption {
+            display: none;
+        }
+
+        .title-modal {
+            font-size: 26px;
+            text-align: center;
+            width: 100%;
+            margin: 30px 0 50px 0;
+        }
+
+        .lign-modal-box {
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            width: fit-content;            /* S'ajuste à la taille du contenu */
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .lign-modal-box svg {  /* pour éviter que la ligne ne soit à gauche */
+            display: block;
+            margin: 0 auto; 
+        }
+
+        .button-add-pictures {
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            height:36px;
+            width:237px;
+            size:14px;
+            font-family:Syne;
+            font-weight:700;
+            border: solid 2px #1D6154;
+            border-radius:50px;
+            background-color: #1D6154;
+            color:white;
+            margin: 30px 0 0 0;
+        }
+
+        .button-add-pictures:hover {
+            color:#1D6154;
+            background-color:white;
+        }
+    `;
+    
+    document.head.appendChild(baliseStyle3);
+}
+
+// Fonction pour gérer la boite modale
+function gestionModalBox() {
+    // Sélectionner la modale par ID
+    let modalBox = document.getElementById("container-modal-box");
+    const bodyContainer = document.body;
+
+    // Vérifier si la modale existe
+    if (!modalBox) {
+        console.error("La boîte modale n'existe pas !");
+        return;
+    }
+
+    // Fonction pour fermer la modale
+    const closeModal = function(event) {
+        event.preventDefault();
+        modalBox.style.display = "none";
+        modalBox.setAttribute("aria-hidden", "true");
+        modalBox.removeAttribute("aria-modal");
+        
+        // Retirer le fond gris et réactiver le scroll du body
+        bodyContainer.style.backgroundColor = "";   // Retirer le fond gris
+        bodyContainer.style.overflow = "";          // Réactiver le scroll
+    };
+
+    // Fonction pour ouvrir la modale
+    const openModal = function(event) {
+        event.preventDefault();
+        modalBox.style.display = "block";
+        modalBox.setAttribute("aria-hidden", "false");
+        modalBox.setAttribute("aria-modal", "true");
+        
+        // Ajouter le fond gris et désactiver le scroll
+        bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";  // Gris transparent
+        bodyContainer.style.overflow = "hidden";                      // Empêche le scroll de la page
+    };
+
+    // Ajouter les écouteurs d'événements pour ouvrir et fermer
+    document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
+        a.addEventListener("click", openModal);
+    });
+
+    document.querySelector(".button-close-modal").addEventListener("click", closeModal);
+
+
+}
+
+
+/* 
     Attention il faut appeler addElement après fetchWorks :
         1- on appelle fetchWorks
         2- ".then()" = une fois la promesse terminée alors...
@@ -364,8 +406,9 @@ fetchWorks().then(() => {
     newFilters();
     setButtonListener();
     formResponse ();
-    globalStyle ();
-    createModalLink();
+    createModalLink();  // générer le lien pour ouvrir la boite modale
+    createModalBox();   // générer la boîte modale
+    gestionModalBox();  // gérer la boite modale
 });
 
 
