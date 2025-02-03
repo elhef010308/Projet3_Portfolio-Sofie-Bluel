@@ -100,7 +100,7 @@
 </main>
 
 <div id="login-container" class="hidden">
-	<form class="container-login-page">
+	<form class="container-login-page" method="POST" action="#">
 		<h2>Log In</h2>
 		<div class="input-field" aria-label="Page de connexion">
 			<p class="e-mail">E-mail</p>
@@ -122,7 +122,7 @@
 				aria-required="true"
 			/>
 		</div>
-		<button type="button">
+		<button type="button" id="submit-login">
 			Se connecter
 		</button>
 		<a href="#" class="forgot-password-link">
@@ -130,6 +130,18 @@
 		</a>
 	</form>
 </div>
+
+<aside id="container-modal-box" class="modal-box-1" role="dialogue" aria-hidden="true" aria-labelledby="title-modal">
+	<div class="modal-container">    
+		<button class="button-close-modal">X</button>
+		<h3 class="title-modal">Galerie photo</h3>
+		<div class="container-pictures-modal"></div>
+		<svg class="lign-modal-box" width="420px" height="2px">
+			<rect width="100%" height="1px" fill="black"></rect>
+		</svg>
+		<button class="button-add-pictures">Ajouter une photo</button>
+	</div>
+</aside>
 
 <footer>
 	<nav>

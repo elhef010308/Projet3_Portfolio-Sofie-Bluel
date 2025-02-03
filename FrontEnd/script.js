@@ -2,7 +2,7 @@
 const galleryContainer = document.querySelector(".gallery");
 
 const mainContainer = document.querySelector("main");
-const formContainer = document.getElementById("login-container");
+const loginContainer = document.getElementById("login-container");
 
 let galleryItems= [];
 
@@ -94,57 +94,81 @@ async function filterByCategories(category) {
 // fonction pour revenir à la page d'accueil du site
 async function setButtonListener() {
     const listItemsLi = document.querySelectorAll("li");
-    let initialContent = mainContainer.innerHTML;
 
     // Sélectionner l'élément en fonction de son index
     const buttonLogin = listItemsLi[2];
     const buttonProjet = listItemsLi[0];
 
     buttonLogin.addEventListener("click", () => {
-        formContainer.classList.remove("hidden");
+        loginContainer.classList.remove("hidden");
         mainContainer.classList.add("hidden");
     });
 
     buttonProjet.addEventListener("click", () => {
-        formContainer.classList.add("hidden");
+        loginContainer.classList.add("hidden");
         mainContainer.classList.remove("hidden");
     });
 }
 
 // fonction pour récupérer les données du formulaire de connexion
 async function formResponse () {
-    const formContainer = document.querySelector(".container-login-page");
-    let emailUsers = document.getElementById("email");
-    let passwordUsers = document.getElementById("password");
+    const formContainer = document.querySelector("#login-container form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const submitButton = document.getElementById("submit-login")
     
-    formContainer.addEventListener("submit", (event) => {
+    // S'assurer que le DOM est bien chargé
+    if (!formContainer || !emailInput || !passwordInput || !submitButton) {
+        console.error("Un ou plusieurs éléments sont manquants dans le DOM.");
+        return;
+    }
+
+    submitButton.addEventListener("click", async (event) => {
         event.preventDefault();  // empêcher le rechargement de la page
         
         // création de l'objet contenant les données à envoyer
-        let usersData = {
-            email: emailUsers.value, 
-            password: passwordUsers.value
+        const usersData = { 
+            email: emailInput.value, 
+            password: passwordInput.value
         };
-        
-        fetch("http://localhost:5678/api/users/login", {
-            method: "POST",
-            headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify(usersData)
-        })
 
-        // convertir la réponse serveur en objet
-        .then (response => {
-            let serverResponseConversion = response.json();
-            return serverResponseConversion;
-        })
+        console.log("Données envoyées :", usersData); // Vérification des données envoyées
         
-        // afficher les données reçues dans la console
-        .then (data => {console.log("Réponse du serveur :", data);})
+        try {
+            const response = await fetch("http://localhost:5678/api/users/login", {
+                method: "POST",
+                headers: {"Content-Type" : "application/json"},
+                body: JSON.stringify(usersData)
+            });
 
-        // gérer les erreurs
-        .catch (error => console.error("Erreur :", error));
-    })
+            if (!response.ok) {
+                console.error("Erreur HTTP :", response.status);
+                alert(`Erreur HTTP : ${response.status}`);
+                return;
+            }
+            
+            // transformer la réponse en JSON
+            const dataForm = await response.json();
+
+            // vérifier que l'API renvoie un token
+            if (dataForm.token) {
+                localStorage.setItem("token", dataForm.token); // sauvegarder le token
+                alert("Connexion réussie !")      // afficher un message si la connexion fonctionne
+                window.location.href = "dashboard.html";  // rediriger l'utilisateur si la connexion a réussi (optionnel)
+            } else {
+                alert("Connexion impossible ! ")  // afficher un message si la connexion ne fonctionne pas
+            }
+        } catch (error) {
+            console.error("Erreur :", error);
+            alert("Une erreur est survenue lors de la connexion.");
+        }
+    });
 }
+
+
+
+
+
 
 // fonction pour créer le lien pur ouvrir la boite modale
 function createModalLink() {
@@ -207,25 +231,8 @@ function createModalLink() {
     modalLinkContainer.style.gap = "30px";
 }
 
-// fonction pour créer le contenu de la boite modale
-function createModalBox() {
-    // Vérifier si la modale existe déjà (évite les doublons)
-    if (document.getElementById("container-modal-box")) return;
-
-    document.body.insertAdjacentHTML("beforeend", `
-        <aside id="container-modal-box" class="modal-box-1" role="dialogue" aria-hidden="true" aria-labelledby="title-modal">
-            <div class="modal-container">    
-                <button class="button-close-modal">X</button>
-                <h3 class="title-modal">Galerie photo</h3>
-                <div class="container-pictures-modal"></div>
-                <svg class="lign-modal-box" width="420px" height="2px">
-                    <rect width="100%" height="1px" fill="black"></rect>
-                </svg>
-                <button class="button-add-pictures">Ajouter une photo</button>
-            </div>
-        </aside>
-    `);
-    
+// fonction pour ajouter les images à la boite modale
+function picturesModalBox() {
     const modalBoxContainer = document.getElementById("container-modal-box");
     const picturesContainerInModal = modalBoxContainer.querySelector(".container-pictures-modal");
     const picturesInGallery = document.querySelectorAll(".img-in-gallery");
@@ -239,113 +246,6 @@ function createModalBox() {
     } else {
         picturesContainerInModal.innerHTML = "<p>Aucune image trouvée</p>";
     }
-
-    // ajouter le style CSS à la boite modale
-    const baliseStyle3 = document.createElement("style");
-
-    baliseStyle3.innerHTML = `
-        .modal-box-1 {
-            display: none; 
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            align-items:center;
-            justify-content:center;
-            z-index:100;
-            background-color:white;
-            border-radius: 10px;
-            width: 630px;   
-            height: auto;    /* Ajuster la hauteur de la modale */
-        }
-
-        .modal-container {
-            position: relative;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .button-close-modal {
-            border:none;
-            top: 20px;
-            right: 20px;
-            background-color: transparent;
-            position: absolute;
-            font-size:18px;
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .container-pictures-modal {
-            width: 420.3px;
-            height:365.71px
-            gap: 9px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);  /* 5 colonnes */
-            justify-content: center;                /* Centre les colonnes horizontalement */
-            align-items: center;                    /* Centre les images verticalement */
-            margin: 0 auto;                         /* Centre le conteneur dans la modale */
-        }
-
-        .container-pictures-modal img {
-            width: 76.86px;
-            height: 102.57px;
-            object-fit: cover;
-            margin: 0 0 29px 0;
-        }
-
-        .container-pictures-modal figcaption {
-            display: none;
-        }
-
-        .title-modal {
-            font-size: 26px;
-            text-align: center;
-            width: 100%;
-            margin: 30px 0 50px 0;
-        }
-
-        .lign-modal-box {
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            width: fit-content;            /* S'ajuste à la taille du contenu */
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        }
-
-        .lign-modal-box svg {  /* pour éviter que la ligne ne soit à gauche */
-            display: block;
-            margin: 0 auto; 
-        }
-
-        .button-add-pictures {
-            display:flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            height:36px;
-            width:237px;
-            size:14px;
-            font-family:Syne;
-            font-weight:700;
-            border: solid 2px #1D6154;
-            border-radius:50px;
-            background-color: #1D6154;
-            color:white;
-            margin: 30px 0 0 0;
-        }
-
-        .button-add-pictures:hover {
-            color:#1D6154;
-            background-color:white;
-        }
-    `;
-    
-    document.head.appendChild(baliseStyle3);
 }
 
 // Fonction pour gérer la boite modale
@@ -390,8 +290,6 @@ function gestionModalBox() {
     });
 
     document.querySelector(".button-close-modal").addEventListener("click", closeModal);
-
-
 }
 
 
@@ -405,10 +303,8 @@ fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
-    formResponse ();
+    formResponse();
     createModalLink();  // générer le lien pour ouvrir la boite modale
-    createModalBox();   // générer la boîte modale
+    picturesModalBox();   // générer la boîte modale
     gestionModalBox();  // gérer la boite modale
 });
-
-
