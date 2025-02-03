@@ -12,6 +12,7 @@ const titleGlobalPage = document.querySelectorAll("h2");
 const titlePortfolioContainer = titleGlobalPage[1];
 titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
+
 // fonction pour récupérer les données de l'API
 async function fetchWorks() {
     const reponse = await fetch("http://localhost:5678/api/works");
@@ -166,10 +167,6 @@ async function formResponse () {
 }
 
 
-
-
-
-
 // fonction pour créer le lien pur ouvrir la boite modale
 function createModalLink() {
     // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
@@ -281,17 +278,33 @@ function gestionModalBox() {
         
         // Ajouter le fond gris et désactiver le scroll
         bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";  // Gris transparent
-        bodyContainer.style.overflow = "hidden";                      // Empêche le scroll de la page
+        bodyContainer.style.overflow = "hidden";                       // Empêche le scroll de la page
     };
 
     // Ajouter les écouteurs d'événements pour ouvrir et fermer
     document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
-        a.addEventListener("click", openModal);
+        a.addEventListener("click", function(event) {
+            openModal(event);
+            event.stopPropagation();  // Empêcher que cet événement se propage au document et ne referme la modale en même temps qu'il l'ouvre
+        });
     });
 
     document.querySelector(".button-close-modal").addEventListener("click", closeModal);
-}
 
+    // Empêcher la fermeture de la modale si l'on clique à l'intérieur de la zone de contenu
+    const modalContent = modalBox.querySelector(".modal-container");
+    modalContent.addEventListener('click', function(event) {
+        event.stopPropagation(); // Empêche la propagation de l'événement au fond de la modale
+    });
+
+    // Fermer la modale lorsque l'on clique en dehors de la boîte modale (fond)
+    document.addEventListener('click', function(event) {
+        // Vérifier si la modale est visible et si le clic n'est pas à l'intérieur de la modale
+        if (modalBox.style.display === "block" && !modalBox.contains(event.target)) {
+            closeModal(event); // Appeler la fonction pour fermer la modale
+        }
+    });
+}
 
 /* 
     Attention il faut appeler addElement après fetchWorks :
