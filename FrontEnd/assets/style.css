@@ -337,8 +337,8 @@ footer nav ul {
 
 .button-close-modal {
 	border:none;
-	top: 20px;
-	right: 20px;
+	top: 25px;
+	right: 25px;
 	background-color: transparent;
 	position: absolute;
 	font-size:18px;
@@ -348,13 +348,13 @@ footer nav ul {
 
 .container-pictures-modal {
 	width: 420.3px;
-	height:365.71px
+	height:365.71px;
 	gap: 9px;
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);  /* 5 colonnes */
 	justify-content: center;                /* Centre les colonnes horizontalement */
 	align-items: center;                    /* Centre les images verticalement */
-	margin: 0 auto;                         /* Centre le conteneur dans la modale */
+	margin: 0 auto 67.29px auto;                         /* Centre le conteneur dans la modale */
 }
 
 .container-pictures-modal img {
@@ -372,7 +372,7 @@ footer nav ul {
 	font-size: 26px;
 	text-align: center;
 	width: 100%;
-	margin: 30px 0 50px 0;
+	margin: 30px 0 40px 0;
 }
 
 .lign-modal-box {
@@ -383,6 +383,7 @@ footer nav ul {
 	display:flex;
 	align-items:center;
 	justify-content:center;
+	margin:0;
 }
 
 .lign-modal-box svg {  /* pour éviter que la ligne ne soit à gauche */
@@ -406,7 +407,7 @@ footer nav ul {
 	border-radius:50px;
 	background-color: #1D6154;
 	color:white;
-	margin: 30px 0 0 0;
+	margin: 30px 0;
 }
 
 .button-add-pictures:hover {
