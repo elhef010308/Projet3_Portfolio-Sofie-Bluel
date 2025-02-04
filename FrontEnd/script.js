@@ -262,8 +262,8 @@ function picturesModalBox() {
     }
 }
 
-// Fonction pour gérer la boite modale
-function gestionModalBox() {
+// Fonction pour gérer la 1ère boite modale
+function gestionModalBox1() {
     // Sélectionner la modale par ID
     let modalBox = document.getElementById("container-modal-box");
     const bodyContainer = document.body;
@@ -324,14 +324,75 @@ function gestionModalBox() {
     });
 }
 
+// fonction pour gérer la 2ème boite modale
+function gestionModalBox2() {
+    let secondModalBox = document.getElementById("container-modal-box2");
+    let firstModalBox = document.getElementById("container-modal-box");
+    const bodyContainer = document.body;
+
+    if (!secondModalBox) {
+        console.error("La boîte modale n'existe pas !");
+        return;
+    }
+
+    const closeSecondModal = function(event) {
+        event.preventDefault();
+        secondModalBox.style.display = "none";
+        secondModalBox.setAttribute("aria-hidden", "true");
+        secondModalBox.removeAttribute("aria-modal");
+        
+        // Retirer le fond gris et réactiver le scroll du body
+        bodyContainer.style.backgroundColor = "";   // Retirer le fond gris
+        bodyContainer.style.overflow = "";          // Réactiver le scroll
+    };
+
+    const openSecondModal = function(event) {
+        event.preventDefault();
+        secondModalBox.style.display = "block";
+        secondModalBox.setAttribute("aria-hidden", "false");
+        secondModalBox.setAttribute("aria-modal", "true");
+        firstModalBox.style.display = "none";
+        firstModalBox.setAttribute("aria-hidden", "true");
+        firstModalBox.removeAttribute("aria-modal");
+        
+        // Ajouter le fond gris et désactiver le scroll
+        bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";  // Gris transparent
+        bodyContainer.style.overflow = "hidden";                       // Empêche le scroll de la page
+    };
+
+    firstModalBox.querySelector(".button-add-pictures").addEventListener("click", function(event) {
+        openSecondModal(event);
+        // Empêcher cet événement de se propager au document, refermant la modale en même temps qu'il ne l'ouvre
+        event.stopPropagation();  
+    });
+
+    secondModalBox.querySelector(".button-close-modal").addEventListener("click", closeSecondModal);
+
+    // Empêcher la fermeture de la modale si l'on clique à l'intérieur de la zone de contenu
+    const modalContent2 = secondModalBox.querySelector(".modal-container2");
+    modalContent2.addEventListener('click', function(event) {
+        event.stopPropagation(); // Empêche la propagation de l'événement au fond de la modale
+    });
+
+    // Fermer la modale lorsque l'on clique en dehors de la boîte modale (fond)
+    document.addEventListener('click', function(event) {
+        // Vérifier si la modale est visible et si le clic n'est pas à l'intérieur de la modale
+        if (secondModalBox.style.display === "block" && !secondModalBox.contains(event.target)) {
+            closeSecondModal(event); // Appeler la fonction pour fermer la modale
+        }
+    });
+}
+
+
 
 fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
     createModalLink();     // générer le lien pour ouvrir la boite modale
-    picturesModalBox();    // générer la boîte modale
-    gestionModalBox();     // gérer la boite modale
+    picturesModalBox();    // ajouter les images à la boite modale
+    gestionModalBox1();     
+    gestionModalBox2()
 });
 
 // Appel de la fonction lorsque le DOM est chargé
