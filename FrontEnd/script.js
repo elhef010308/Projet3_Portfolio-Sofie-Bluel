@@ -114,8 +114,8 @@ async function setButtonListener() {
 // fonction pour récupérer les données du formulaire de connexion
 async function formResponse () {
     const formContainer = document.querySelector("#login-container form");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
+    const emailInput = document.getElementById("e-mail");
+    const passwordInput = document.getElementById("pass-word");
     const submitButton = document.getElementById("submit-login")
     
     // S'assurer que le DOM est bien chargé
@@ -124,48 +124,65 @@ async function formResponse () {
         return;
     }
 
-    submitButton.addEventListener("click", async (event) => {
+    console.log("Formulaire détecté");
+
+    // ajout de l'évènement au bouton de soumission
+    formContainer.addEventListener("submit", async (event) => {
         event.preventDefault();  // empêcher le rechargement de la page
+        console.log("Evenement bouton : OK");
         
-        // création de l'objet contenant les données à envoyer
+        // récupération des données saisies par l'utilisateur
         const usersData = { 
             email: emailInput.value, 
             password: passwordInput.value
         };
 
-        console.log("Données envoyées :", usersData); // Vérification des données envoyées
+        // vérifier les valeurs saisies par l'utilisateur
+        console.log("Données envoyées : ", usersData);
+
+        // Désactiver le bouton pendant l'envoi
+        submitButton.disabled = true; 
         
         try {
+            // appel de l'API avec les données
             const response = await fetch("http://localhost:5678/api/users/login", {
                 method: "POST",
-                headers: {"Content-Type" : "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(usersData)
             });
 
+            // vérifier la réponse HTTP
             if (!response.ok) {
-                console.error("Erreur HTTP :", response.status);
-                alert(`Erreur HTTP : ${response.status}`);
+                const errorMessage = await response.text();
+                console.error("Erreur API :", response.status, errorMessage);
+                alert(`Erreur HTTP : ${response.status} - ${errorMessage}`);
                 return;
             }
             
-            // transformer la réponse en JSON
+            // récupérer la réponse JSON
             const dataForm = await response.json();
+            console.log("Réponse API reçue :", dataForm);
 
             // vérifier que l'API renvoie un token
             if (dataForm.token) {
                 localStorage.setItem("token", dataForm.token); // sauvegarder le token
-                alert("Connexion réussie !")      // afficher un message si la connexion fonctionne
-                window.location.href = "dashboard.html";  // rediriger l'utilisateur si la connexion a réussi (optionnel)
+                alert("Connexion réussie !")             // afficher un message si la connexion fonctionne
+                
+                // rediriger l'utilisateur lorsque la connexion a réussie
+                document.getElementById("login-container").style.display = "none";
+                document.querySelector("main").style.display = "block";
             } else {
                 alert("Connexion impossible ! ")  // afficher un message si la connexion ne fonctionne pas
             }
         } catch (error) {
             console.error("Erreur :", error);
             alert("Une erreur est survenue lors de la connexion.");
+        } finally {
+            // Réactiver le bouton après réception de la réponse
+            submitButton.disabled = false; 
         }
     });
 }
-
 
 // fonction pour créer le lien pur ouvrir la boite modale
 function createModalLink() {
@@ -285,7 +302,8 @@ function gestionModalBox() {
     document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
         a.addEventListener("click", function(event) {
             openModal(event);
-            event.stopPropagation();  // Empêcher que cet événement se propage au document et ne referme la modale en même temps qu'il l'ouvre
+            // Empêcher cet événement de se propager au document, refermant la modale en même temps qu'il ne l'ouvre
+            event.stopPropagation();  
         });
     });
 
@@ -306,18 +324,15 @@ function gestionModalBox() {
     });
 }
 
-/* 
-    Attention il faut appeler addElement après fetchWorks :
-        1- on appelle fetchWorks
-        2- ".then()" = une fois la promesse terminée alors...
-        3- ...alors on appelle les fonctions suivantes 
-*/
+
 fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
-    formResponse();
-    createModalLink();  // générer le lien pour ouvrir la boite modale
-    picturesModalBox();   // générer la boîte modale
-    gestionModalBox();  // gérer la boite modale
+    createModalLink();     // générer le lien pour ouvrir la boite modale
+    picturesModalBox();    // générer la boîte modale
+    gestionModalBox();     // gérer la boite modale
 });
+
+// Appel de la fonction lorsque le DOM est chargé
+document.addEventListener('DOMContentLoaded', formResponse);
