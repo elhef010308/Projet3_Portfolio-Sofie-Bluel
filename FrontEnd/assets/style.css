@@ -209,7 +209,8 @@ footer nav ul {
 }
 
 
-/* MOI */
+/* Nouveaux éléments ajoutés */
+	/***** Filtres du portfolio *****/
 .hidden {
     display: none;
 }
@@ -264,6 +265,7 @@ footer nav ul {
 	color:white;
 }
 
+	/***** Page de connexion *****/
 .container-login-page {
 	display:flex;
 	justify-content:center;
@@ -314,6 +316,7 @@ footer nav ul {
 	color:#1D6154;
 }
 
+	/***** Boites modales *****/
 .modal-box-1, .modal-box-2 {
 	display: none; 
 	position: fixed;
@@ -421,6 +424,10 @@ footer nav ul {
 	color:white;
 	margin: 30px 0;
 }
+.button-add-pictures:hover {
+	color:#1D6154;
+	background-color:white;
+}
 
 .button-to-save {
 	display:flex;
@@ -441,14 +448,23 @@ footer nav ul {
 	margin: 30px 0;
 }
 
-.button-add-pictures:hover {
-	color:#1D6154;
-	background-color:white;
+.input-field-in-modal {
+	width:420px;
+	display:flex;
+	align-items:flex-start;
+	justify-content:center;
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
+	flex-direction:column;
+	margin: 0;
 }
-
 .input-field-in-modal input, .input-field-in-modal select {
-	margin:22px 0;
-	width:379px;
+	margin:0;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	width:420px;
 	height:51px;
 	border: none;
 	border-radius: 2px;
@@ -456,41 +472,56 @@ footer nav ul {
 	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre subtile */
 	outline: none; /* Empêche la bordure bleue par défaut au focus */
 }
+.input-field-in-modal select {
+	margin: 0 0 40px 0;
+}
+.input-field-in-modal input {
+	margin: 0 0 20px 0;
+}
+.input-field-in-modal p {
+	text-align:left;
+	position: relative;
+	margin: 0 0 20px 0;
+}
 
 .square-to-add-pictures {
 	background-color: #E8F1F6;
 	border: none;
 	border-radius: 5px;
-	display: flex;
-	align-items: center;
-	justify-content:center;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	flex-direction: column;
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
 	width: 420px;
 	height: 169px;
-	margin: 0 0 50px 0;
+	margin: 0 0 20px 0;
+	padding: 15px 0;
 }
 
-.square-to-add-pictures i {
-	display:flex;
-	justify-content:center;
-	margin: 10px 0 0 0;
-	padding:0;
-}
-
-.square-to-add-pictures p {
-	font-size:10px;
-	color: #444444;
-	text-align: center;
-	padding:0;
+.icone-in-square {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+	width:80px;
+	height: 80px;
 	margin: 0;
+	padding:0;
+}
+
+.icone-in-square i {
+	font-size: 76px;
+	color: #CBD6DC;
+	margin: 0;
+	padding:0;
 }
 
 .button-load-pictures {
 	display:flex;
 	align-items: center;
 	justify-content: center;
-	position: relative;
-	left: 50%;
-	transform: translateX(-50%);
 	height:36px;
 	width:173px;
 	size:14px;
@@ -500,7 +531,16 @@ footer nav ul {
 	border-radius:50px;
 	background-color: #CBD6DC;
 	color:#306685;
-	margin: 10px 0;
+	margin: 0;
+}
+
+.square-to-add-pictures .subtitle-info {
+	font-size:10px;
+	font-weight: 400;
+	color: #444444;
+	text-align: center;
+	padding:0;
+	margin: 0;
 }
 
 
