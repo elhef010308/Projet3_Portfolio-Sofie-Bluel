@@ -258,20 +258,29 @@ function picturesModalBox() {
             const clonePicture = picture.cloneNode(true);
 
             // Créer une DIV pour contenir l'image et le bouton de suppression
-            const containerDeleteButton = document.createElement('div');
-            containerDeleteButton.classList.add('container-delete-button'); // Classe pour la div contenant l'image et le bouton
+            const containerDeleteButton = document.createElement("div");
+            containerDeleteButton.classList.add("container-delete-button"); // Classe pour la div contenant l'image et le bouton
             
             // Ajouter l'image clonée dans cette div
             containerDeleteButton.appendChild(clonePicture);
 
             // Créer le bouton poubelle (icône)
-            const deleteButton = document.createElement('button');
-            deleteButton.classList.add('delete-button'); // Classe pour le bouton
-            deleteButton.innerHTML = '<i class="fa-solid fa-trash-can"></i>'; // Icône poubelle (si vous utilisez FontAwesome)
+            const deleteButton = document.createElement("button");
+            deleteButton.classList.add("delete-button"); // Classe pour le bouton
+            deleteButton.innerHTML = "<i class='fa-solid fa-trash-can'></i>"; // Icône poubelle (si vous utilisez FontAwesome)
 
             // Ajouter l'événement pour supprimer l'image lorsqu'on clique sur le bouton
-            deleteButton.addEventListener('click', () => {
+            deleteButton.addEventListener("click", () => {
                 containerDeleteButton.remove(); // Supprime la div contenant l'image et le bouton
+                
+                // Trouver l'index de l'image dans la galerie d'origine
+                // AWAY.FROM pour convertir la liste en tableau 
+                const pictureIndex = Array.from(picturesInGallery).indexOf(picture);
+
+                // Si l'image existe dans la galerie, on la supprime
+                if (pictureIndex !== -1) {
+                    picturesInGallery[pictureIndex].remove(); // Supprimer l'image de la galerie
+                }
             });
 
             // Ajouter le bouton poubelle à la div
