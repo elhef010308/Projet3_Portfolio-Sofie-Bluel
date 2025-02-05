@@ -251,11 +251,34 @@ function picturesModalBox() {
     const picturesContainerInModal = modalBoxContainer.querySelector(".container-pictures-modal");
     const picturesInGallery = document.querySelectorAll(".img-in-gallery");
 
-    // vérifier si les images existent dans la gallerie et les cloner
+    // vérifier si les images existent dans la galerie et les cloner
     if (picturesInGallery.length > 0) {
         picturesInGallery.forEach(picture => {
-            const clonePisctures = picture.cloneNode(true);
-            picturesContainerInModal.appendChild(clonePisctures);
+            // Cloner l'image
+            const clonePicture = picture.cloneNode(true);
+
+            // Créer une DIV pour contenir l'image et le bouton de suppression
+            const containerDeleteButton = document.createElement('div');
+            containerDeleteButton.classList.add('container-delete-button'); // Classe pour la div contenant l'image et le bouton
+            
+            // Ajouter l'image clonée dans cette div
+            containerDeleteButton.appendChild(clonePicture);
+
+            // Créer le bouton poubelle (icône)
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-button'); // Classe pour le bouton
+            deleteButton.innerHTML = '<i class="fa-solid fa-trash-can"></i>'; // Icône poubelle (si vous utilisez FontAwesome)
+
+            // Ajouter l'événement pour supprimer l'image lorsqu'on clique sur le bouton
+            deleteButton.addEventListener('click', () => {
+                containerDeleteButton.remove(); // Supprime la div contenant l'image et le bouton
+            });
+
+            // Ajouter le bouton poubelle à la div
+            containerDeleteButton.appendChild(deleteButton);
+
+            // Ajouter cette div (image + bouton) dans le conteneur de la modale
+            picturesContainerInModal.appendChild(containerDeleteButton);
         });
     } else {
         picturesContainerInModal.innerHTML = "<p>Aucune image trouvée</p>";

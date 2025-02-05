@@ -383,6 +383,35 @@ footer nav ul {
 	display: none;
 }
 
+/* Nouveau style pour la div contenant l'image et le bouton poubelle */
+.container-delete-button {
+    position: relative;  /* Permet de positionner le bouton par rapport à l'image */
+    display: inline-block;
+    margin: 0;
+	padding:0;
+}
+
+.delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: black;
+    border: none;
+	border-radius:2px;
+	width: 17px; /* Taille du carré */
+    height: 17px; /* Taille du carré */
+	display: flex; /* Utiliser Flexbox pour centrer l'icône */
+    justify-content: center; /* Centrer horizontalement */
+    align-items: center; /* Centrer verticalement */
+    cursor: pointer;
+}
+
+.delete-button i {
+	color:white;
+	font-size:9px;
+    pointer-events: none; /* Pour s'assurer que le clic sur l'icône fonctionne bien */
+}
+
 .title-modal {
 	font-size: 26px;
 	text-align: center;
