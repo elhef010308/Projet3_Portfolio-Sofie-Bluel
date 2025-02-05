@@ -166,11 +166,16 @@
 				name="text"
 				id="text-title-pictures-modal"
 				title="Veuillez ajouter un titre à votre image"
-				required
 				aria-required="true"
+				required
 			/>
 			<p class="category-pictures-modal">Catégories</p>
-			<select class="add-puctures-category"></select>
+			<select class="add-puctures-category" required>
+				<option value="" class="default-option" disabled selected>Sélectionner votre catégorie</option>
+				<option value="Objets">Objets</option>
+				<option value="Appartements">Appartements</option>
+				<option value="Hotels & restaurants">Hotels & restaurants</option>
+			</select>
 		</div>
 		<svg class="lign-modal-box" width="420px" height="2px">
 			<rect width="100%" height="1px" fill="black"></rect>

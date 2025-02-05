@@ -488,6 +488,7 @@ footer nav ul {
 	flex-direction:column;
 	margin: 0;
 }
+
 .input-field-in-modal input, .input-field-in-modal select {
 	margin:0;
 	display:flex;
@@ -501,16 +502,36 @@ footer nav ul {
 	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre subtile */
 	outline: none; /* Empêche la bordure bleue par défaut au focus */
 }
+
 .input-field-in-modal select {
 	margin: 0 0 40px 0;
+	padding: 0 15px;
 }
+
 .input-field-in-modal input {
 	margin: 0 0 20px 0;
+	padding: 0 15px;
 }
+
 .input-field-in-modal p {
 	text-align:left;
 	position: relative;
 	margin: 0 0 20px 0;
+}
+
+.input-field-in-modal select .default-option {
+    font-style: italic;
+    color: gray; /* Option que l'on ne peut pas cliquer en gris */
+}
+
+.input-field-in-modal select:invalid {
+	font-style: italic;
+    color: gray; /* option affichée par défaut */
+}
+
+.input-field-in-modal select option {
+	color: black;
+    font-style: normal;
 }
 
 .square-to-add-pictures {
@@ -527,7 +548,6 @@ footer nav ul {
 	width: 420px;
 	height: 169px;
 	margin: 0 0 20px 0;
-	padding: 15px 0;
 }
 
 .icone-in-square {
@@ -536,7 +556,7 @@ footer nav ul {
     align-items: center;
 	width:80px;
 	height: 80px;
-	margin: 0;
+	margin: 15px 0 0 0;
 	padding:0;
 }
 
@@ -569,7 +589,13 @@ footer nav ul {
 	color: #444444;
 	text-align: center;
 	padding:0;
-	margin: 0;
+	margin: 0 0 15px 0;
+}
+
+.square-to-add-pictures .img-selected-to-add {
+	width: auto;
+	height: 100%;
+	object-fit: cover;
 }
 
 

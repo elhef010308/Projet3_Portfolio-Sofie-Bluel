@@ -254,8 +254,9 @@ function picturesModalBox() {
     // vérifier si les images existent dans la galerie et les cloner
     if (picturesInGallery.length > 0) {
         picturesInGallery.forEach(picture => {
-            // Cloner l'image
+            // Cloner l'image et lui ajouyer une classe
             const clonePicture = picture.cloneNode(true);
+            clonePicture.classList.add("pictures-in-modal-box");
 
             // Créer une DIV pour contenir l'image et le bouton de suppression
             const containerDeleteButton = document.createElement("div");
@@ -386,6 +387,43 @@ function gestionModalBox() {
     });
 }
 
+// fonction pour ajouter des images via la modale
+async function addPictutesInModal() {
+    let picturesInGallery = document.querySelectorAll(".img-in-gallery");
+    let picturesInModalBox = document.querySelectorAll(".pictures-in-modal-box");
+    const containerToSelectPictures = document.querySelector(".square-to-add-pictures");
+    const iconeOfPictures = document.querySelector(".icone-in-square");
+    const buttonToSelectPictures = document.querySelector(".button-load-pictures");
+    const fileInput = document.getElementById("file-input-modal");
+    const textSubtitle = document.querySelector(".subtitle-info");
+    
+    // ÉTAPE 1 : afficher l'image sélectionnée
+    fileInput.addEventListener("change", function (event) {
+        // Récupérer le premier fichier sélectionné
+        const fileSelected = event.target.files[0];
+        
+        // Vérifier s'il s'agit bien d'un fichier de type "image/png" ou "image/jpeg"
+        if (!fileSelected || !fileSelected.type.startsWith("image/")) {
+            alert("Veuillez sélectionner une image !");
+            // arrêter la fonction si le fichier n'est pas dans le bon TYPE
+            return;
+        }
+
+        // ÉTAPE 2 : Créer l'élément <img> et afficher l'image sélectionnée
+        const imageSelected = document.createElement("img");
+        // transformer l'image en URL temporaire
+        imageSelected.src = URL.createObjectURL(fileSelected);
+        imageSelected.setAttribute("class", "img-selected-to-add"); 
+
+        // ÉTAPE 3 : Ajouter l'image à la div et masquer les anciens éléments
+        containerToSelectPictures.appendChild(imageSelected);
+        iconeOfPictures.style.display = "none";
+        buttonToSelectPictures.style.display = "none";
+        textSubtitle.style.display = "none";
+    });
+}
+
+
 
 fetchWorks().then(() => {
     addElement(galleryItems);
@@ -394,6 +432,7 @@ fetchWorks().then(() => {
     createModalLink();     // générer le lien pour ouvrir la boite modale
     picturesModalBox();    // ajouter les images à la boite modale
     gestionModalBox();
+    addPictutesInModal();
 });
 
 // Appel de la fonction lorsque le DOM est chargé
