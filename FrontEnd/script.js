@@ -245,7 +245,7 @@ function createModalLink() {
     modalLinkContainer.style.gap = "30px";
 }
 
-// fonction pour ajouter les images à la boite modale
+// fonction pour gérer les images dans la boite modale
 function picturesModalBox() {
     const modalBoxContainer = document.getElementById("container-modal-box");
     const picturesContainerInModal = modalBoxContainer.querySelector(".container-pictures-modal");
@@ -271,16 +271,23 @@ function picturesModalBox() {
             deleteButton.innerHTML = "<i class='fa-solid fa-trash-can'></i>"; // Icône poubelle (si vous utilisez FontAwesome)
 
             // Ajouter l'événement pour supprimer l'image lorsqu'on clique sur le bouton
-            deleteButton.addEventListener("click", () => {
-                containerDeleteButton.remove(); // Supprime la div contenant l'image et le bouton
-                
-                // Trouver l'index de l'image dans la galerie d'origine
-                // AWAY.FROM pour convertir la liste en tableau 
-                const pictureIndex = Array.from(picturesInGallery).indexOf(picture);
+            deleteButton.addEventListener("click", async () => {
+                // afficher un message pour confirmer la suppression 
+                const userConfirmed = confirm("Êtes-vous sûr de vouloir supprimer cette image ?");
 
-                // Si l'image existe dans la galerie, on la supprime
-                if (pictureIndex !== -1) {
-                    picturesInGallery[pictureIndex].remove(); // Supprimer l'image de la galerie
+                if (userConfirmed) {
+                    containerDeleteButton.remove(); // Supprime la div contenant l'image et le bouton
+                
+                    // Trouver l'index de l'image dans la galerie d'origine
+                    // AWAY.FROM pour convertir la liste en tableau 
+                    const pictureIndex = Array.from(picturesInGallery).indexOf(picture);
+
+                    // Si l'image existe dans la galerie, on la supprime
+                    if (pictureIndex !== -1) {
+                        picturesInGallery[pictureIndex].remove(); // Supprimer l'image de la galerie
+                    }
+
+                    await deleteImageAPI(pictureIndex);
                 }
             });
 
@@ -292,6 +299,25 @@ function picturesModalBox() {
         });
     } else {
         picturesContainerInModal.innerHTML = "<p>Aucune image trouvée</p>";
+    }
+}
+
+// fonction pour supprimer une image dans l'API
+async function deleteImageAPI(pictureIndex) {
+    const apiUrlToDelete = "";
+
+    try {
+        const response = await fetch(apiUrlToDelete, {
+            method: 'DELETE', // on supprime l'image
+        });
+
+        if (response.ok) {
+            alert("Image supprimée avec succès !");
+        } else {
+            alert("Erreur lors de la suppression de l'image !");
+        }
+    } catch (error) {
+        alert("Une erreur s'est produite lors de la requête API !")
     }
 }
 
@@ -396,6 +422,9 @@ async function addPictutesInModal() {
     const buttonToSelectPictures = document.querySelector(".button-load-pictures");
     const fileInput = document.getElementById("file-input-modal");
     const textSubtitle = document.querySelector(".subtitle-info");
+    let imageDescription = document.getElementById("text-title-pictures-modal");
+    let imageCategory = document.querySelector(".add-puctures-category");
+    let buttonToSave = document.querySelector(".button-to-save");
     
     // ÉTAPE 1 : afficher l'image sélectionnée
     fileInput.addEventListener("change", function (event) {
@@ -421,8 +450,104 @@ async function addPictutesInModal() {
         buttonToSelectPictures.style.display = "none";
         textSubtitle.style.display = "none";
     });
+
+    // fonction pour ACTIVER/DESACTIVER le bouton
+    function activButtonToSave() {
+        if (fileInput.files.length > 0 && imageCategory.value.trim() !== "" && imageDescription.value !== "") {
+            buttonToSave.style.backgroundColor = "#1D6154";
+            buttonToSave.style.border = "solid 2px #1D6154"
+            buttonToSave.style.color = "white";
+            buttonToSave.removeAttribute("disabled");
+        } else {
+            buttonToSave.setAttribute("disabled", true);
+        }
+    }
+
+    // ajouter des écouteurs d'événements pour activer ou désactiver le bouton
+    imageDescription.addEventListener("input", activButtonToSave);
+    imageCategory.addEventListener("change", activButtonToSave);
+    fileInput.addEventListener("change", activButtonToSave);
+
+    // s'assurer que le bouton est bien désactivé initialement
+    activButtonToSave();
 }
 
+// fonction pour ajouter une image dans l'API
+async function addImageApi(event) {
+    event.preventDefault();
+
+    const inputText = document.getElementById("text-title-pictures-modal");
+    const selectOption = document.querySelector(".add-puctures-category");
+    const imageSelect = document.getElementById("file-input-modal");
+    const buttonToSave = document.querySelector(".button-to-save");
+    const formData = new FormData();
+    const urlApiToAdd = ""; // lien Url de l'API
+    const token = localStorage.getItem("token"); // Récupérer le token stocké
+
+    // Vérifie si le bouton est toujours désactivé, et si oui, on sort de la fonction
+    if (buttonToSave.disabled) {
+        alert("Veuillez compléter les 3 champs pour valider !");
+        return;
+    }
+        
+    // données envoyées à l'API
+    formData.append("title", inputText.value.trim());
+    formData.append("image", imageSelect.files[0]);  //on envoie l'image comme fichier
+    formData.append("categoryId", parseInt(selectOption.value)); 
+
+     try {
+        // 1. envoyer l'image avec formData
+        const response = await fetch(urlApiToAdd, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,  // Utilisation du token
+            },
+            body: formData, // FormData = image + titre + catégorie
+        });
+
+        // vérifier si la réponse est OK
+        if (response.ok) {
+            // 2. récupérer la réponse de l'API contenant l'URL de l'image
+            const data = await response.json();
+
+            // vérifier que l'API retourne bien l'URL de l'image
+            if (data.imageUrl) {
+                const imageUrl = data.imageUrl; // URL retournée par l'API
+
+                // 3. créer l'objet final à renvoyer à l'API
+                const finalData = {
+                    title: inputText.value.trim(),
+                    imageUrl: imageUrl, // Utilisation de l'URL renvoyée par le serveur
+                    categoryId: parseInt(selectOption.value),
+                };
+
+                // 4. renvoyer à l'API pour finaliser l'ajout
+                const finalResponse = await fetch(urlApiToAdd, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`, // Utilisation du token
+                    },
+                    body: JSON.stringify(finalData),
+                });
+
+                if (finalResponse.ok) {
+                    alert("Image ajoutée avec succès !");
+                    location.reload(); // recharger la page pour ajouter l'image à la galerie
+                } else {
+                    alert("Impossible d'ajouter l'image !");
+                }
+            } else {
+                alert("Impossible d'ajouter la nouvelle image !");
+            }
+        } else {
+            alert("Aucune URL n'est retournée par l'API !");
+        }
+    } catch (error) {
+        console.error("Erreur API : ", error);
+        alert("Une erreur s'est produite lors de la requête API !");
+    }
+}
 
 
 fetchWorks().then(() => {
@@ -437,3 +562,10 @@ fetchWorks().then(() => {
 
 // Appel de la fonction lorsque le DOM est chargé
 document.addEventListener('DOMContentLoaded', formResponse);
+
+document.addEventListener("DOMContentLoaded", function() {
+    const buttonToSave = document.querySelector(".button-to-save");
+    buttonToSave.addEventListener("click", addImageApi); // Attacher le clic sur le bouton
+});
+
+

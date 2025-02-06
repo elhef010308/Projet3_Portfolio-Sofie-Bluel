@@ -435,6 +435,12 @@ footer nav ul {
 	margin: 0 auto; 
 }
 
+.form-to-add-picture {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
 .button-add-pictures {
 	display:flex;
 	align-items: center;
@@ -505,23 +511,16 @@ footer nav ul {
 
 .input-field-in-modal select {
 	margin: 0 0 40px 0;
-	padding: 0 15px;
 }
 
 .input-field-in-modal input {
 	margin: 0 0 20px 0;
-	padding: 0 15px;
 }
 
 .input-field-in-modal p {
-	text-align:left;
+	text-align: left;
 	position: relative;
 	margin: 0 0 20px 0;
-}
-
-.input-field-in-modal select .default-option {
-    font-style: italic;
-    color: gray; /* Option que l'on ne peut pas cliquer en gris */
 }
 
 .input-field-in-modal select:invalid {
@@ -529,9 +528,9 @@ footer nav ul {
     color: gray; /* option affichée par défaut */
 }
 
-.input-field-in-modal select option {
-	color: black;
-    font-style: normal;
+/* Masquer la première option tout en la désactivant */
+.input-field-in-modal select .default-option {
+    display: none; /* Masquer cette option visuellement */
 }
 
 .square-to-add-pictures {
