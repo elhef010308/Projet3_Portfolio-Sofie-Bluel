@@ -65,9 +65,9 @@ body {
 header {
 	display: flex;
 	justify-content: space-between;
-	
-	margin: 50px 0
+	margin: 60px 0
 }
+
 section {
 	margin: 50px 0
 }
@@ -210,6 +210,41 @@ footer nav ul {
 
 
 /* Nouveaux éléments ajoutés */
+	/***** Barre noire lorsque l'on est connecté *****/
+#edition-mode-bar {
+    width: 100%;
+	max-width: 1440px;
+    height: 50px;
+    background-color: black;
+    color: white;
+    display: none; /* cachée par défaut*/ 
+    position: fixed;
+    top: 0;
+    left: 50%; /* Centre la barre */
+    transform: translateX(-50%); /* Correction pour le centrage */
+    z-index: 10; /* Pour qu'elle soit au-dessus de tout le reste */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Contenu de la barre : icône et texte */
+.edition-content {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Un peu d'espace entre l'icône et le texte */
+}
+
+/* Style de l'icône */
+#icone-mode-bar {
+    font-size: 18px; /* Taille de l'icône */
+}
+
+/* Style du texte */
+#edition-mode-bar span {
+    font-size: 18px;
+    font-weight: 500;
+}
+
 	/***** Filtres du portfolio *****/
 .hidden {
     display: none;

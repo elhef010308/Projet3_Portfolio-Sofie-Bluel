@@ -109,6 +109,25 @@ async function setButtonListener() {
     });
 }
 
+
+// fonction pour se déconnecter 
+function logout() {
+    // 1. Supprimer le token du localStorage
+    localStorage.removeItem("token");
+
+    //2. Masquer la barre noire en haut de la page web
+    const blackBar = document.getElementById("edition-mode-bar");
+    blackBar.style.display = "none";
+
+    //3. Remplacer "déconnexion" par "login"
+    const listItemsLi = document.querySelectorAll("li");
+    const buttonLogin = listItemsLi[2];
+    buttonLogin.textContent = "Login";
+
+    //4. Supprimer l'évènement "déconnexion" pour éviter les conflits
+    buttonLogin.removeEventListener("click", logout);
+}
+
 // fonction pour récupérer les données du formulaire de connexion
 async function formResponse () {
     const formContainer = document.querySelector("#login-container form");
@@ -122,7 +141,6 @@ async function formResponse () {
         console.error("Un ou plusieurs éléments sont manquants dans le DOM.");
         return;
     }
-
     console.log("Formulaire détecté");
 
     // ajout de l'évènement au bouton de soumission
@@ -204,6 +222,15 @@ async function formResponse () {
                 // rediriger l'utilisateur lorsque la connexion a réussie
                 document.getElementById("login-container").style.display = "none";
                 document.querySelector("main").style.display = "block";
+
+                const barreModeEdition = document.getElementById("edition-mode-bar");
+                barreModeEdition.style.display = "flex";
+
+                const listItemsLi = document.querySelectorAll("li");
+                const buttonLogin = listItemsLi[2];
+                // Remplacer le texte de "login" par "Déconnexion"
+                buttonLogin.textContent = "Déconnexion";
+                buttonLogin.addEventListener("click", logout); // Ajoute un écouteur d'événement pour la déconnexion
             } 
         } catch (error) {
             console.error("Erreur :", error);
