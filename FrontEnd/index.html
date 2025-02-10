@@ -103,6 +103,7 @@
 
 <div id="login-container" class="hidden">
 	<form class="container-login-page">
+		<p class="error-message">Identifiants de connexion incorrects !</p>
 		<h2>Log In</h2>
 		<div class="input-field" aria-label="Page de connexion">
 			<p class="e-mail">E-mail</p>
@@ -111,8 +112,6 @@
 				name="email"
 				id="e-mail"
 				title="Veuillez indiquer votre adresse mail"
-				required
-				aria-required="true"
 			/>
 			<p class="password">Mot de passe</p>
 			<input
@@ -120,8 +119,6 @@
 				name="password"
 				id="pass-word"
 				title="Veuillez saisir votre mot de passe"
-				required
-				aria-required="true"
 			/>
 		</div>
 		<button type="submit" id="submit-login">

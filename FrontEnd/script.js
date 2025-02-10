@@ -1,14 +1,10 @@
 // gestion des variables globales
 const galleryContainer = document.querySelector(".gallery");
-
 const mainContainer = document.querySelector("main");
 const loginContainer = document.getElementById("login-container");
-
 let galleryItems= [];
-
 let portfolioContainer = document.getElementById("portfolio");
 const titleGlobalPage = document.querySelectorAll("h2");
-
 const titlePortfolioContainer = titleGlobalPage[1];
 titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
@@ -19,7 +15,7 @@ async function fetchWorks() {
     galleryItems = await reponse.json();
     console.log(galleryItems);
 
-    galleryContainer.innerHTML = ''
+    galleryContainer.innerHTML = '';
     console.log(galleryContainer);
 } 
 
@@ -65,7 +61,7 @@ async function newFilters() {
     listCategories.forEach(category => {
         const buttonFilters = document.createElement("button");
         buttonFilters.textContent = category;
-        buttonFilters.setAttribute("class", "buttons-to-filter")
+        buttonFilters.setAttribute("class", "buttons-to-filter");
 
         // Lier un événement au clic sur chaque bouton
         buttonFilters.addEventListener("click", () => {
@@ -113,13 +109,13 @@ async function setButtonListener() {
     });
 }
 
-
 // fonction pour récupérer les données du formulaire de connexion
 async function formResponse () {
     const formContainer = document.querySelector("#login-container form");
     const emailInput = document.getElementById("e-mail");
     const passwordInput = document.getElementById("pass-word");
-    const submitButton = document.getElementById("submit-login")
+    const submitButton = document.getElementById("submit-login");
+    const errorMessage = document.querySelector(".error-message"); // Sélectionner l'élément d'erreur correctement
     
     // S'assurer que le DOM est bien chargé
     if (!formContainer || !emailInput || !passwordInput || !submitButton) {
@@ -141,7 +137,41 @@ async function formResponse () {
         };
 
         // vérifier les valeurs saisies par l'utilisateur
-        console.log("Données envoyées : ", usersData);
+        console.log("Données à envoyer : ", usersData);
+
+        // Réinitialiser les erreurs avant validation
+        emailInput.classList.remove("input-error");
+        passwordInput.classList.remove("input-error");
+        emailInput.placeholder = ""; // Réinitialiser le placeholder
+        passwordInput.placeholder = ""; // Réinitialiser le placeholder
+        errorMessage.style.display = "none";  // Réinitialiser le message d'erreur global
+
+        let hasError = false;
+
+        // Vérifier si les champs INPUT sont vides
+        if (!usersData.email) {
+            emailInput.classList.add("input-error");
+            emailInput.placeholder  = "Veuillez remplir ce champ"; // info-bulle pour email
+            hasError = true;
+        }
+        if (!usersData.password) {
+            passwordInput.classList.add("input-error");
+            passwordInput.placeholder  = "Veuillez remplir ce champ"; // info-bulle pour mot de passe
+            hasError = true;
+        }
+
+        // Vérifier le format de l'email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (usersData.email && !emailRegex.test(usersData.email)) {
+            emailInput.classList.add("input-error");
+            emailInput.placeholder  = "Format d'email invalide"; // info-bulle pour email incorrect
+            hasError = true;
+        }
+
+        // Si il y a une erreur, ne pas envoyer la requête
+        if (hasError) {
+            return;
+        }
 
         // Désactiver le bouton pendant l'envoi
         submitButton.disabled = true; 
@@ -156,9 +186,10 @@ async function formResponse () {
 
             // vérifier la réponse HTTP
             if (!response.ok) {
-                const errorMessage = await response.text();
-                console.error("Erreur API :", response.status, errorMessage);
-                alert(`Erreur HTTP : ${response.status} - ${errorMessage}`);
+                const textError = document.querySelector(".error-message");
+                if (textError) {
+                    textError.style.display = "block"; 
+                }
                 return;
             }
             
@@ -173,9 +204,7 @@ async function formResponse () {
                 // rediriger l'utilisateur lorsque la connexion a réussie
                 document.getElementById("login-container").style.display = "none";
                 document.querySelector("main").style.display = "block";
-            } else {
-                alert("Connexion impossible ! ")  // afficher un message si la connexion ne fonctionne pas
-            }
+            } 
         } catch (error) {
             console.error("Erreur :", error);
             alert("Une erreur est survenue lors de la connexion.");
@@ -185,6 +214,7 @@ async function formResponse () {
         }
     });
 }
+
 
 // fonction pour créer le lien pur ouvrir la boite modale
 function createModalLink() {
@@ -441,8 +471,6 @@ function gestionModalBox() {
 
 // fonction pour ajouter des images via la modale
 async function addPictutesInModal() {
-    let picturesInGallery = document.querySelectorAll(".img-in-gallery");
-    let picturesInModalBox = document.querySelectorAll(".pictures-in-modal-box");
     const containerToSelectPictures = document.querySelector(".square-to-add-pictures");
     const iconeOfPictures = document.querySelector(".icone-in-square");
     const buttonToSelectPictures = document.querySelector(".button-load-pictures");
