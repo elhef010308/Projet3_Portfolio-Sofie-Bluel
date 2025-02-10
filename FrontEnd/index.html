@@ -141,7 +141,7 @@
 		<svg class="lign-modal-box" width="420px" height="2px">
 			<rect width="100%" height="1px" fill="black"></rect>
 		</svg>
-		<button class="button-add-pictures">Ajouter une photo</button>
+		<button class="button-add-pictures" disabled>Ajouter une photo</button>
 	</div>
 </aside>
 
@@ -151,7 +151,7 @@
 		<button class="button-go-back">←</button>
 		<h3 class="title-modal">Ajout photo</h3>
 
-		<form class="form-to-add-picture">
+		<form class="form-to-add-picture" id="form-to-add-picture">
 			<div class="square-to-add-pictures">
 				<div class="icone-in-square">
 					<i class="fa-regular fa-image"></i>
@@ -175,9 +175,9 @@
 				<p class="category-pictures-modal">Catégories</p>
 				<select class="add-puctures-category" required>
 					<option value="" class="default-option" disabled selected>Sélectionner votre catégorie</option>
-					<option value="1">Objets</option>
-					<option value="2" class="category-selected">Appartements</option>
-					<option value="3" class="category-selected">Hotels & restaurants</option>
+					<option class="option-to-choose">Objets</option>
+					<option class="option-to-choose">Appartements</option>
+					<option class="option-to-choose">Hotels & restaurants</option>
 				</select>
 			</div>
 			<svg class="lign-modal-box" width="420px" height="2px">

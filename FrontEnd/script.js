@@ -329,6 +329,7 @@ function gestionModalBox() {
     const modalContent1 = firstModalBox.querySelector(".modal-container");
     const modalContent2 = secondModalBox.querySelector(".modal-container2");
     const buttonToGoBack = document.querySelector(".button-go-back");
+    const buttonAddPictures = document.querySelector(".button-add-pictures");
 
     // VERIFIER L'EXISTENCE DES MODALES
     if (!firstModalBox || !secondModalBox) {
@@ -356,6 +357,7 @@ function gestionModalBox() {
         modalBox.style.display = "block";
         modalBox.setAttribute("aria-hidden", "false");
         modalBox.removeAttribute("aria-modal");
+        buttonAddPictures.removeAttribute("disabled");
 
         // Activer le fond gris et désactiver le scroll du body
         bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
@@ -472,83 +474,167 @@ async function addPictutesInModal() {
     activButtonToSave();
 }
 
-// fonction pour ajouter une image dans l'API
-async function addImageApi(event) {
-    event.preventDefault();
+// Fonction pour redimensionner une image
+function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
 
-    const inputText = document.getElementById("text-title-pictures-modal");
-    const selectOption = document.querySelector(".add-puctures-category");
-    const imageSelect = document.getElementById("file-input-modal");
-    const buttonToSave = document.querySelector(".button-to-save");
-    const formData = new FormData();
-    const urlApiToAdd = ""; // lien Url de l'API
-    const token = localStorage.getItem("token"); // Récupérer le token stocké
+        reader.onload = function (e) {
+            img.src = e.target.result;
+        };
 
-    // Vérifie si le bouton est toujours désactivé, et si oui, on sort de la fonction
-    if (buttonToSave.disabled) {
-        alert("Veuillez compléter les 3 champs pour valider !");
-        return;
-    }
-        
-    // données envoyées à l'API
-    formData.append("title", inputText.value.trim());
-    formData.append("image", imageSelect.files[0]);  //on envoie l'image comme fichier
-    formData.append("categoryId", parseInt(selectOption.value)); 
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
 
-     try {
-        // 1. envoyer l'image avec formData
-        const response = await fetch(urlApiToAdd, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,  // Utilisation du token
-            },
-            body: formData, // FormData = image + titre + catégorie
-        });
+        img.onload = function () {
+            let width = img.width;
+            let height = img.height;
 
-        // vérifier si la réponse est OK
-        if (response.ok) {
-            // 2. récupérer la réponse de l'API contenant l'URL de l'image
-            const data = await response.json();
-
-            // vérifier que l'API retourne bien l'URL de l'image
-            if (data.imageUrl) {
-                const imageUrl = data.imageUrl; // URL retournée par l'API
-
-                // 3. créer l'objet final à renvoyer à l'API
-                const finalData = {
-                    title: inputText.value.trim(),
-                    imageUrl: imageUrl, // Utilisation de l'URL renvoyée par le serveur
-                    categoryId: parseInt(selectOption.value),
-                };
-
-                // 4. renvoyer à l'API pour finaliser l'ajout
-                const finalResponse = await fetch(urlApiToAdd, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`, // Utilisation du token
-                    },
-                    body: JSON.stringify(finalData),
-                });
-
-                if (finalResponse.ok) {
-                    alert("Image ajoutée avec succès !");
-                    location.reload(); // recharger la page pour ajouter l'image à la galerie
-                } else {
-                    alert("Impossible d'ajouter l'image !");
-                }
-            } else {
-                alert("Impossible d'ajouter la nouvelle image !");
+            // Vérifier si l'image a besoin d'être redimensionnée
+            if (width <= maxWidth && height <= maxHeight) {
+                return resolve(file); // Retourne l'original si pas besoin de redimensionner
             }
-        } else {
-            alert("Aucune URL n'est retournée par l'API !");
-        }
-    } catch (error) {
-        console.error("Erreur API : ", error);
-        alert("Une erreur s'est produite lors de la requête API !");
-    }
+
+            // Calculer les nouvelles dimensions en respectant le ratio
+            if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+            }
+            if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
+            }
+
+            // Création du canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convertir en Blob et retourner l'image redimensionnée
+            canvas.toBlob(blob => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error("Erreur lors de la conversion de l'image"));
+                }
+            }, 'image/jpeg', quality);
+        };
+
+        img.onerror = reject;
+    });
 }
 
+// fonctio,n pour envoyer une nouvelle image à l'API
+async function addImageApi(event) {
+    event.preventDefault();
+    
+    // Récupération des éléments
+    const inputText = document.getElementById("text-title-pictures-modal");
+    const imageSelect = document.getElementById("file-input-modal");
+    const selectOption = document.querySelector(".add-puctures-category");
+    const token = localStorage.getItem("token");
+    let categoryId;
+    
+    // Vérification du token
+    if (!token) {
+        alert("Token manquant, veuillez vous reconnecter.");
+        return;
+    }
+    
+    // Vérification des champs requis
+    if (!inputText.value.trim() || !selectOption.value || !imageSelect.files[0]) {
+        alert("Veuillez compléter tous les champs !");
+        return;
+    }
+    
+    // Définir categoryId basé sur la sélection
+    if (selectOption.value === "Objets") {
+        categoryId = 1;
+    } else if (selectOption.value === "Appartements") {
+        categoryId = 2;
+    } else if (selectOption.value === "Hotels & restaurants") {
+        categoryId = 4;
+    }
+
+    console.log("Catégorie sélectionnée :", categoryId);
+    console.log("Titre :", inputText.value.trim());
+
+    const file = imageSelect.files[0]; // récupérer le fichier sléctionné
+    console.log("Image récupérée : ", file);
+
+    try {
+        // Redimensionnement de l'image
+        const resizedImage = await resizeImage(file);
+        console.log("Image redimensionnée : ", resizedImage);
+        
+        // Vérification du type de resizedImage
+        if (!(resizedImage instanceof Blob)) {
+            console.error("Le fichier redimensionné n'est pas un Blob");
+            return;
+        }
+
+        // Créer un nouveau nom de fichier pour l'image redimensionnée
+        const newFileName = "resized_image.jpg"; // Nouveau nom de fichier
+        const renamedFile = new File([resizedImage], newFileName, { type: "image/jpeg" });
+
+        // Création du FormData avec les noms de champs exacts
+        const formData = new FormData();
+        formData.append('title', inputText.value.trim());
+        formData.append('category', categoryId);
+        formData.append('image', renamedFile);
+        
+        // Vérification des données à envoyer
+        console.log("FormData envoyé :");
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
+        // Configuration de la requête avec headers appropriés
+        const response = await fetch("http://localhost:5678/api/works", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            },
+            body: formData
+        });
+        
+        // Vérification de la réponse
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erreur serveur:', {
+                status: response.status,
+                message: errorText
+            });
+            throw new Error(`Erreur ${response.status}: ${errorText}`);
+        }
+        
+        const responseData = await response.json();
+        console.log("Réponse API : ", responseData);
+        
+        // Mise à jour de la galerie
+        const gallery = document.querySelector(".gallery");
+        const newImageElement = document.createElement("figure");
+        newImageElement.innerHTML = `
+            <img src="${responseData.imageUrl}" alt="${responseData.title}">
+            <figcaption>${responseData.title}</figcaption>
+        `;
+        gallery.appendChild(newImageElement);
+        
+        alert("Image ajoutée avec succès !");
+        
+    } catch (error) {
+        console.error("Erreur complète:", {
+            message: error.message,
+            stack: error.stack,
+            type: error.name
+        });
+        alert("Une erreur est survenue côté serveur. Veuillez contacter l'administrateur.");
+    }
+}
 
 fetchWorks().then(() => {
     addElement(galleryItems);
@@ -564,8 +650,8 @@ fetchWorks().then(() => {
 document.addEventListener('DOMContentLoaded', formResponse);
 
 document.addEventListener("DOMContentLoaded", function() {
-    const buttonToSave = document.querySelector(".button-to-save");
-    buttonToSave.addEventListener("click", addImageApi); // Attacher le clic sur le bouton
+    const form = document.getElementById("form-to-add-picture");
+    form.addEventListener("submit", addImageApi);
 });
 
 
