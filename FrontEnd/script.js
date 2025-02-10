@@ -23,6 +23,7 @@ async function fetchWorks() {
     console.log(galleryContainer);
 } 
 
+
 // fonction pour vider la galerie et insérer les données de l'API à la place
 async function addElement(itemsToDisplay) {
     galleryContainer.innerHTML = '';
@@ -91,6 +92,7 @@ async function filterByCategories(category) {
     addElement(filteredItems);
 }
 
+
 // fonction pour afficher la page de connexion
 // fonction pour revenir à la page d'accueil du site
 async function setButtonListener() {
@@ -110,6 +112,7 @@ async function setButtonListener() {
         mainContainer.classList.remove("hidden");
     });
 }
+
 
 // fonction pour récupérer les données du formulaire de connexion
 async function formResponse () {
@@ -166,7 +169,6 @@ async function formResponse () {
             // vérifier que l'API renvoie un token
             if (dataForm.token) {
                 localStorage.setItem("token", dataForm.token); // sauvegarder le token
-                alert("Connexion réussie !")             // afficher un message si la connexion fonctionne
                 
                 // rediriger l'utilisateur lorsque la connexion a réussie
                 document.getElementById("login-container").style.display = "none";
@@ -245,6 +247,7 @@ function createModalLink() {
     modalLinkContainer.style.gap = "30px";
 }
 
+
 // fonction pour gérer les images dans la boite modale
 function picturesModalBox() {
     const modalBoxContainer = document.getElementById("container-modal-box");
@@ -257,6 +260,9 @@ function picturesModalBox() {
             // Cloner l'image et lui ajouyer une classe
             const clonePicture = picture.cloneNode(true);
             clonePicture.classList.add("pictures-in-modal-box");
+
+            // Récupérer le titre de l'image depuis le <figcaption>
+            const caption = picture.querySelector("figcaption").textContent;
 
             // Créer une DIV pour contenir l'image et le bouton de suppression
             const containerDeleteButton = document.createElement("div");
@@ -276,18 +282,10 @@ function picturesModalBox() {
                 const userConfirmed = confirm("Êtes-vous sûr de vouloir supprimer cette image ?");
 
                 if (userConfirmed) {
-                    containerDeleteButton.remove(); // Supprime la div contenant l'image et le bouton
-                
-                    // Trouver l'index de l'image dans la galerie d'origine
-                    // AWAY.FROM pour convertir la liste en tableau 
-                    const pictureIndex = Array.from(picturesInGallery).indexOf(picture);
-
-                    // Si l'image existe dans la galerie, on la supprime
-                    if (pictureIndex !== -1) {
-                        picturesInGallery[pictureIndex].remove(); // Supprimer l'image de la galerie
-                    }
-
-                    await deleteImageAPI(pictureIndex);
+                    containerDeleteButton.remove(); // Supprimer la div contenant l'image et le bouton
+                    
+                    // Passer le titre à la fonction de suppression
+                    await deleteImageAPI(caption); // Passer le titre pour récupérer l'ID et supprimer l'image
                 }
             });
 
@@ -303,23 +301,48 @@ function picturesModalBox() {
 }
 
 // fonction pour supprimer une image dans l'API
-async function deleteImageAPI(pictureIndex) {
-    const apiUrlToDelete = "";
-
+async function deleteImageAPI(imageTitle) {
     try {
-        const response = await fetch(apiUrlToDelete, {
-            method: 'DELETE', // on supprime l'image
-        });
+        // Appel à l'API pour récupérer la liste des images
+        const response = await fetch("http://localhost:5678/api/works");
+        const images = await response.json();
 
-        if (response.ok) {
-            alert("Image supprimée avec succès !");
+        // Trouver l'image avec le titre correspondant
+        const imageToDelete = images.find(image => image.title === imageTitle);
+
+        if (imageToDelete) {
+            // L'ID de l'image à supprimer
+            const imageId = imageToDelete.id;
+
+            // Vérifier si le token d'authentification est disponible dans le localStorage
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Token d'authentification manquant !");
+                return;
+            }
+
+            // Effectuer la requête DELETE avec l'ID de l'image
+            const deleteResponse = await fetch(`http://localhost:5678/api/works/${imageId}`, {
+                method: 'DELETE', // Méthode DELETE pour supprimer l'image
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`, // Si besoin d'un token d'authentification
+                },
+            });
+
+            if (deleteResponse.ok) {
+                alert("Image supprimée avec succès !");
+                location.reload();
+            } else {
+                alert("Erreur lors de la suppression de l'image !");
+            }
         } else {
-            alert("Erreur lors de la suppression de l'image !");
+            alert("Aucune image trouvée avec ce titre.");
         }
     } catch (error) {
-        alert("Une erreur s'est produite lors de la requête API !")
+        alert("Une erreur s'est produite lors de la requête API !");
     }
 }
+
 
 // fonction pour gérer les boites modales
 function gestionModalBox() {
@@ -415,6 +438,7 @@ function gestionModalBox() {
     });
 }
 
+
 // fonction pour ajouter des images via la modale
 async function addPictutesInModal() {
     let picturesInGallery = document.querySelectorAll(".img-in-gallery");
@@ -473,6 +497,7 @@ async function addPictutesInModal() {
     // s'assurer que le bouton est bien désactivé initialement
     activButtonToSave();
 }
+
 
 // Fonction pour redimensionner une image
 function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
@@ -622,10 +647,11 @@ async function addImageApi(event) {
             <img src="${responseData.imageUrl}" alt="${responseData.title}">
             <figcaption>${responseData.title}</figcaption>
         `;
+
         gallery.appendChild(newImageElement);
-        
         alert("Image ajoutée avec succès !");
-        
+        location.reload();
+       
     } catch (error) {
         console.error("Erreur complète:", {
             message: error.message,
