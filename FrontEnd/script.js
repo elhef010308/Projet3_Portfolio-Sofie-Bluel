@@ -190,12 +190,12 @@ async function formResponse () {
         // Vérifier si les champs INPUT sont vides
         if (!usersData.email) {
             emailInput.classList.add("input-error");
-            emailInput.placeholder  = "Veuillez remplir ce champ"; // info-bulle pour email
+            emailInput.placeholder  = "Entrez votre adresse e-mail"; // info-bulle pour email
             hasError = true;
         }
         if (!usersData.password) {
             passwordInput.classList.add("input-error");
-            passwordInput.placeholder  = "Veuillez remplir ce champ"; // info-bulle pour mot de passe
+            passwordInput.placeholder  = "Entrez votre mot de passe"; // info-bulle pour mot de passe
             hasError = true;
         }
 
@@ -356,7 +356,6 @@ function picturesModalBox() {
 
                 // Ajouter un événement au bouton "Oui" qui supprimera cette image spécifique
                 document.getElementById("confirmDelete").onclick = async function () {
-                    containerDeleteButton.remove(); // Supprimer la div contenant l'image et le bouton
                     // Passer le titre à la fonction de suppression
                     await deleteImageAPI(caption); // Passer le titre pour récupérer l'ID et supprimer l'image
                     document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
@@ -381,6 +380,12 @@ function picturesModalBox() {
 
 // fonction pour supprimer une image dans l'API
 async function deleteImageAPI(imageTitle) {
+    const errorInModal = document.querySelector(".error-message-modale");
+    const tokenIsNone = document.createElement("p");
+    tokenIsNone.textContent = "Veuillez vous identifier !";
+    tokenIsNone.classList.add("token-is-none");
+    const modalOne = document.getElementById("container-modal-box");
+
     try {
         // Appel à l'API pour récupérer la liste des images
         const response = await fetch("http://localhost:5678/api/works");
@@ -396,7 +401,8 @@ async function deleteImageAPI(imageTitle) {
             // Vérifier si le token d'authentification est disponible dans le localStorage
             const token = localStorage.getItem("token");
             if (!token) {
-                alert("Token d'authentification manquant !");
+                errorInModal.remove();
+                modalOne.appendChild(tokenIsNone);
                 return;
             }
 
@@ -409,6 +415,9 @@ async function deleteImageAPI(imageTitle) {
             });
 
             if (deleteResponse.ok) {
+                // supprimer la div contenant l'image et le bouton
+                containerDeleteButton.remove(); 
+
                 // Sélectionner l'image correspondante dans la galerie du DOM
                 const imageElementDom = document.querySelector(`.gallery img[alt='${imageTitle}']`);
                 if (imageElementDom) {
@@ -425,13 +434,13 @@ async function deleteImageAPI(imageTitle) {
                 bodyContainer.style.backgroundColor = "";   
                 bodyContainer.style.overflow = "";
             } else {
-                alert("Erreur lors de la suppression de l'image !");
+                errorInModal.style.display = "block";
             }
         } else {
-            alert("Aucune image trouvée avec ce titre.");
+            errorInModal.style.display = "block";
         }
     } catch (error) {
-        alert("Une erreur s'est produite lors de la requête API !");
+        errorInModal.style.display = "block";
     }
 }
 
@@ -549,8 +558,6 @@ async function addPictutesInModal() {
         
         // Vérifier s'il s'agit bien d'un fichier de type "image/png" ou "image/jpeg"
         if (!fileSelected || !fileSelected.type.startsWith("image/")) {
-            alert("Veuillez sélectionner une image !");
-            // arrêter la fonction si le fichier n'est pas dans le bon TYPE
             return;
         }
 
@@ -651,11 +658,18 @@ async function addImageApi(event) {
     const imageSelect = document.getElementById("file-input-modal");
     const selectOption = document.querySelector(".add-puctures-category");
     const token = localStorage.getItem("token");
+    const errorInModal = document.querySelector(".error-message-modale");
+    const tokenIsNone = document.createElement("p");
+    tokenIsNone.textContent = "Veuillez vous identifier !";
+    tokenIsNone.classList.add("token-is-none");
+    const modalOne = document.getElementById("container-modal-box2");
+
     let categoryId;
     
     // Vérification du token
     if (!token) {
-        alert("Token manquant, veuillez vous reconnecter.");
+        errorInModal.remove();
+        modalOne.appendChild(tokenIsNone);
         return;
     }
     

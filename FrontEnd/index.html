@@ -119,14 +119,12 @@
 				type="email"
 				name="email"
 				id="e-mail"
-				placeholder="Entrez votre adresse e-mail"
 			/>
 			<p class="password">Mot de passe</p>
 			<input
 				type="password"
 				name="password"
 				id="pass-word"
-				placeholder="Entrez votre mot de passe"
 			/>
 		</div>
 		<button type="submit" id="submit-login">
@@ -153,6 +151,7 @@
 		<button id="confirmDelete" class="btn-yes">OUI</button>
 		<button id="cancelDelete" class="btn-no">NON</button>
 	</div>
+	<p class="error-message-modale">Une erreur est survenue !</p>
 </aside>
 
 <aside id="container-modal-box2" class="modal-box-2" role="dialogue" aria-hidden="true" aria-labelledby="title-modal">
@@ -178,13 +177,13 @@
 					name="text"
 					value=""
 					id="text-title-pictures-modal"
-					title="Veuillez ajouter un titre à votre image"
+					placeholder="Veuillez ajouter un titre"
 					aria-required="true"
 					required
 				/>
 				<p class="category-pictures-modal">Catégories</p>
 				<select class="add-puctures-category" required>
-					<option value="" class="default-option" disabled selected>Sélectionner votre catégorie</option>
+					<option value="" class="default-option" disabled selected>Veuillez sélectionner une catégorie</option>
 					<option class="option-to-choose">Objets</option>
 					<option class="option-to-choose">Appartements</option>
 					<option class="option-to-choose">Hotels & restaurants</option>
