@@ -300,6 +300,11 @@ footer nav ul {
 	color:white;
 }
 
+	/***** cursor de la souris *****/
+li, button, a {
+	cursor: pointer;
+}
+
 	/***** Page de connexion *****/
 .container-login-page {
 	display:flex;
@@ -341,6 +346,7 @@ footer nav ul {
 
 .input-field input {
 	margin:22px 0;
+	padding:0 0 0 10px;
 	width:379px;
 	height:51px;
 	border: none;
@@ -348,6 +354,11 @@ footer nav ul {
 	background-color:white;
 	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre subtile */
 	outline: none; /* Empêche la bordure bleue par défaut au focus */
+}
+
+.input-field input::placeholder {
+	font-style: italic;
+	color: #979696;
 }
 
 .forgot-password-link {
@@ -367,7 +378,7 @@ footer nav ul {
 }
 
 /* Style spécifique pour l'affichage du placeholder d'erreur */
-.input-field input::placeholder {
+.input-field input.input-error::placeholder {
     color: rgb(184, 1, 1); /* Texte de l'erreur en rouge */
     text-align: center;
 }

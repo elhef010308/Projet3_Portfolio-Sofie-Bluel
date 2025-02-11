@@ -178,14 +178,6 @@ async function formResponse () {
             hasError = true;
         }
 
-        // Vérifier le format de l'email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (usersData.email && !emailRegex.test(usersData.email)) {
-            emailInput.classList.add("input-error");
-            emailInput.placeholder  = "Format d'email invalide"; // info-bulle pour email incorrect
-            hasError = true;
-        }
-
         // Si il y a une erreur, ne pas envoyer la requête
         if (hasError) {
             return;
