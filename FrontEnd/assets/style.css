@@ -384,6 +384,47 @@ li, button, a {
 }
 
 	/***** Boites modales *****/
+/* message de confirmations */
+.confirmation-delete {
+	display:none;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+    z-index: 10;
+}
+
+.confirmation-box p {
+    margin-bottom: 15px;
+    font-size: 14px;
+	font-style:italic;
+}
+
+.btn-no, .btn-yes {
+    background-color: white;
+    color: #1D6154;
+	font-weight: 500;
+    padding: 5px;
+    border: solid 2px #1D6154;
+    cursor: pointer;
+    margin-right: 10px;
+	margin-top: 10px;
+    border-radius: 5px;
+	width: 50px;
+}
+
+.btn-no:hover, .btn-yes:hover {
+	color: white;
+	background-color: #1D6154;
+}
+
+/* les boites modales*/
 .modal-box-1, .modal-box-2 {
 	display: none; 
 	position: fixed;

@@ -316,7 +316,7 @@ function picturesModalBox() {
             // Créer une DIV pour contenir l'image et le bouton de suppression
             const containerDeleteButton = document.createElement("div");
             containerDeleteButton.classList.add("container-delete-button"); // Classe pour la div contenant l'image et le bouton
-            
+
             // Ajouter l'image clonée dans cette div
             containerDeleteButton.appendChild(clonePicture);
 
@@ -327,15 +327,21 @@ function picturesModalBox() {
 
             // Ajouter l'événement pour supprimer l'image lorsqu'on clique sur le bouton
             deleteButton.addEventListener("click", async () => {
-                // afficher un message pour confirmer la suppression 
-                const userConfirmed = confirm("Êtes-vous sûr de vouloir supprimer cette image ?");
+                // Afficher la boîte de confirmation
+                document.getElementById("confirmationBox").style.display = "block";
+                
 
-                if (userConfirmed) {
+                // Ajouter un événement au bouton "Oui" qui supprimera cette image spécifique
+                document.getElementById("confirmDelete").onclick = async function () {
                     containerDeleteButton.remove(); // Supprimer la div contenant l'image et le bouton
-                    
                     // Passer le titre à la fonction de suppression
                     await deleteImageAPI(caption); // Passer le titre pour récupérer l'ID et supprimer l'image
+                    document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
                 }
+                // Annuler la suppression
+                document.getElementById("cancelDelete").onclick = function () {
+                    document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
+                };
             });
 
             // Ajouter le bouton poubelle à la div
@@ -348,6 +354,7 @@ function picturesModalBox() {
         picturesContainerInModal.innerHTML = "<p>Aucune image trouvée</p>";
     }
 }
+
 
 // fonction pour supprimer une image dans l'API
 async function deleteImageAPI(imageTitle) {
@@ -379,8 +386,21 @@ async function deleteImageAPI(imageTitle) {
             });
 
             if (deleteResponse.ok) {
-                alert("Image supprimée avec succès !");
-                location.reload();
+                // Sélectionner l'image correspondante dans la galerie du DOM
+                const imageElementDom = document.querySelector(`.gallery img[alt='${imageTitle}']`);
+                if (imageElementDom) {
+                    // Supprimer l'élément image de la galerie
+                    imageElementDom.closest('figure').remove();
+                }
+                
+                // fermer la boite modale
+                const boiteModale = document.getElementById("container-modal-box");
+                const bodyContainer = document.body;
+                boiteModale.style.display = "none";
+                boiteModale.setAttribute("aria-hidden", "true");
+                boiteModale.getAttribute("aria-modal", "true");
+                bodyContainer.style.backgroundColor = "";   
+                bodyContainer.style.overflow = "";
             } else {
                 alert("Erreur lors de la suppression de l'image !");
             }
