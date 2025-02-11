@@ -9,6 +9,27 @@ const titlePortfolioContainer = titleGlobalPage[1];
 titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
 
+// fonction pour vérifier la présence ou non du token lors du rechargement de la page
+window.addEventListener("load", () => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        // Si un token est présent, l'utilisateur est connecté
+        document.getElementById("edition-mode-bar").style.display = "flex";  // Afficher la barre noire
+        const listItemsLi = document.querySelectorAll("li");
+        const buttonLogin = listItemsLi[2];
+        buttonLogin.textContent = "Déconnexion";  // Remplacer "Login" par "Déconnexion"
+        buttonLogin.addEventListener("click", logout);  // Ajouter l'écouteur de déconnexion
+    } else {
+        // Si pas de token, afficher "Login"
+        document.getElementById("edition-mode-bar").style.display = "none";  // Masquer la barre noire
+        const listItemsLi = document.querySelectorAll("li");
+        const buttonLogin = listItemsLi[2];
+        buttonLogin.textContent = "Login";  // Remettre le texte "Login"
+    }
+});
+
+
 // fonction pour récupérer les données de l'API
 async function fetchWorks() {
     const reponse = await fetch("http://localhost:5678/api/works");
@@ -126,6 +147,10 @@ function logout() {
 
     //4. Supprimer l'évènement "déconnexion" pour éviter les conflits
     buttonLogin.removeEventListener("click", logout);
+
+    //5. rediriger l'utilisateur sur la page principale
+    document.getElementById("login-container").style.display = "none";
+    document.querySelector("main").style.display = "block";
 }
 
 // fonction pour récupérer les données du formulaire de connexion
@@ -141,7 +166,6 @@ async function formResponse () {
         console.error("Un ou plusieurs éléments sont manquants dans le DOM.");
         return;
     }
-    console.log("Formulaire détecté");
 
     // ajout de l'évènement au bouton de soumission
     formContainer.addEventListener("submit", async (event) => {
@@ -153,9 +177,6 @@ async function formResponse () {
             email: emailInput.value, 
             password: passwordInput.value
         };
-
-        // vérifier les valeurs saisies par l'utilisateur
-        console.log("Données à envoyer : ", usersData);
 
         // Réinitialiser les erreurs avant validation
         emailInput.classList.remove("input-error");
@@ -223,6 +244,8 @@ async function formResponse () {
                 // Remplacer le texte de "login" par "Déconnexion"
                 buttonLogin.textContent = "Déconnexion";
                 buttonLogin.addEventListener("click", logout); // Ajoute un écouteur d'événement pour la déconnexion
+
+                location.reload();
             } 
         } catch (error) {
             console.error("Erreur :", error);
