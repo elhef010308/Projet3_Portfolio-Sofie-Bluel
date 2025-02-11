@@ -151,6 +151,7 @@ function logout() {
     //5. rediriger l'utilisateur sur la page principale
     document.getElementById("login-container").style.display = "none";
     document.querySelector("main").style.display = "block";
+    location.reload();
 }
 
 // fonction pour récupérer les données du formulaire de connexion
@@ -357,7 +358,7 @@ function picturesModalBox() {
                 // Ajouter un événement au bouton "Oui" qui supprimera cette image spécifique
                 document.getElementById("confirmDelete").onclick = async function () {
                     // Passer le titre à la fonction de suppression
-                    await deleteImageAPI(caption); // Passer le titre pour récupérer l'ID et supprimer l'image
+                    await deleteImageAPI(caption, containerDeleteButton); // Passer le titre pour récupérer l'ID et supprimer l'image
                     document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
                 }
                 // Annuler la suppression
@@ -379,11 +380,13 @@ function picturesModalBox() {
 
 
 // fonction pour supprimer une image dans l'API
-async function deleteImageAPI(imageTitle) {
+async function deleteImageAPI(imageTitle, containerDeleteButton) {
     const errorInModal = document.querySelector(".error-message-modale");
+    errorInModal.style.display = "none";
+
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("token-is-none");
+    tokenIsNone.classList.add("erreur-in-modal2");
     const modalOne = document.getElementById("container-modal-box");
 
     try {
@@ -397,11 +400,9 @@ async function deleteImageAPI(imageTitle) {
         if (imageToDelete) {
             // L'ID de l'image à supprimer
             const imageId = imageToDelete.id;
-
-            // Vérifier si le token d'authentification est disponible dans le localStorage
             const token = localStorage.getItem("token");
+
             if (!token) {
-                errorInModal.remove();
                 modalOne.appendChild(tokenIsNone);
                 return;
             }
@@ -416,7 +417,8 @@ async function deleteImageAPI(imageTitle) {
 
             if (deleteResponse.ok) {
                 // supprimer la div contenant l'image et le bouton
-                containerDeleteButton.remove(); 
+                containerDeleteButton.remove();
+                errorInModal.style.display = "none"; // cacher le message d'erreur par défaut
 
                 // Sélectionner l'image correspondante dans la galerie du DOM
                 const imageElementDom = document.querySelector(`.gallery img[alt='${imageTitle}']`);
@@ -425,13 +427,12 @@ async function deleteImageAPI(imageTitle) {
                     imageElementDom.closest('figure').remove();
                 }
                 
-                // fermer la boite modale
+                // Fermer la boîte modale après suppression
                 const boiteModale = document.getElementById("container-modal-box");
                 const bodyContainer = document.body;
                 boiteModale.style.display = "none";
                 boiteModale.setAttribute("aria-hidden", "true");
-                boiteModale.getAttribute("aria-modal", "true");
-                bodyContainer.style.backgroundColor = "";   
+                bodyContainer.style.backgroundColor = "";
                 bodyContainer.style.overflow = "";
             } else {
                 errorInModal.style.display = "block";
@@ -658,24 +659,26 @@ async function addImageApi(event) {
     const imageSelect = document.getElementById("file-input-modal");
     const selectOption = document.querySelector(".add-puctures-category");
     const token = localStorage.getItem("token");
+    const modalTwo = document.getElementById("container-modal-box2");
     const errorInModal = document.querySelector(".error-message-modale");
+
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("token-is-none");
-    const modalOne = document.getElementById("container-modal-box2");
+    tokenIsNone.classList.add("erreur-in-modal2");
+    const errorApi = document.createElement("p");
+    errorApi.textContent = "Ajout de l'image impossible !";
+    errorApi.classList.add("erreur-in-modal2");
 
     let categoryId;
     
     // Vérification du token
     if (!token) {
-        errorInModal.remove();
-        modalOne.appendChild(tokenIsNone);
+        modalTwo.appendChild(tokenIsNone);
         return;
     }
     
     // Vérification des champs requis
     if (!inputText.value.trim() || !selectOption.value || !imageSelect.files[0]) {
-        alert("Veuillez compléter tous les champs !");
         return;
     }
     
@@ -697,7 +700,6 @@ async function addImageApi(event) {
     try {
         // Redimensionnement de l'image
         const resizedImage = await resizeImage(file);
-        console.log("Image redimensionnée : ", resizedImage);
         
         // Vérification du type de resizedImage
         if (!(resizedImage instanceof Blob)) {
@@ -738,7 +740,8 @@ async function addImageApi(event) {
                 status: response.status,
                 message: errorText
             });
-            throw new Error(`Erreur ${response.status}: ${errorText}`);
+            modalTwo.appendChild(errorApi);
+            return;
         }
         
         const responseData = await response.json();
@@ -751,18 +754,22 @@ async function addImageApi(event) {
             <img src="${responseData.imageUrl}" alt="${responseData.title}">
             <figcaption>${responseData.title}</figcaption>
         `;
-
         gallery.appendChild(newImageElement);
-        alert("Image ajoutée avec succès !");
-        location.reload();
-       
+        
+        // Fermer la boîte modale après ajout
+        const boiteModale = document.getElementById("container-modal-box2");
+        const bodyContainer = document.body;
+        boiteModale.style.display = "none";
+        boiteModale.setAttribute("aria-hidden", "true");
+        bodyContainer.style.backgroundColor = "";
+        bodyContainer.style.overflow = "";
     } catch (error) {
         console.error("Erreur complète:", {
             message: error.message,
             stack: error.stack,
             type: error.name
         });
-        alert("Une erreur est survenue côté serveur. Veuillez contacter l'administrateur.");
+        modalTwo.appendChild(errorInModal);
     }
 }
 
