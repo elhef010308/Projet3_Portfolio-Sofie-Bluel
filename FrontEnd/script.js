@@ -1,47 +1,82 @@
-// gestion des variables globales
 const galleryContainer = document.querySelector(".gallery");
 const mainContainer = document.querySelector("main");
 const loginContainer = document.getElementById("login-container");
-let galleryItems= [];
 let portfolioContainer = document.getElementById("portfolio");
 const titleGlobalPage = document.querySelectorAll("h2");
+
 const titlePortfolioContainer = titleGlobalPage[1];
 titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
+let galleryItems= [];
 
-// fonction pour vérifier la présence ou non du token lors du rechargement de la page
+let filteredItems = [];
+
+const bodyContainer = document.body;
+
+const listItemsLi = document.querySelectorAll("li");
+const buttonLogin = listItemsLi[2];  
+const buttonProjet = listItemsLi[0];  
+
+const barreModeEdition = document.getElementById("edition-mode-bar");
+
+const formContainer = document.querySelector("#login-container form");
+const emailInput = document.getElementById("e-mail");
+const passwordInput = document.getElementById("pass-word");
+const submitButton = document.getElementById("submit-login");
+const errorMessage = document.querySelector(".error-message");
+
+let firstModalBox = document.getElementById("container-modal-box");
+let secondModalBox = document.getElementById("container-modal-box2");
+const modalContent1 = firstModalBox.querySelector(".modal-container");
+const modalContent2 = secondModalBox.querySelector(".modal-container2");
+
+const buttonToGoBack = document.querySelector(".button-go-back");
+const buttonAddPictures = document.querySelector(".button-add-pictures");
+
+const errorInModal = document.querySelector(".error-message-modale");
+
+const containerToSelectPictures = document.querySelector(".square-to-add-pictures");
+const iconeOfPictures = document.querySelector(".icone-in-square");
+const buttonToSelectPictures = document.querySelector(".button-load-pictures");
+const textSubtitle = document.querySelector(".subtitle-info");
+
+const imageInput = document.getElementById("file-input-modal");
+let imageDescription = document.getElementById("text-title-pictures-modal");
+let imageCategory = document.querySelector(".add-puctures-category");
+
+let buttonToSave = document.querySelector(".button-to-save");
+
+
+// FONCTION POUR : vérifier la présence du token lors du rechargement de la page
 window.addEventListener("load", () => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-        // Si un token est présent, l'utilisateur est connecté
+    if (token) { // Si l'utilisateur est connecté
         document.getElementById("edition-mode-bar").style.display = "flex";  // Afficher la barre noire
         const listItemsLi = document.querySelectorAll("li");
         const buttonLogin = listItemsLi[2];
-        buttonLogin.textContent = "Déconnexion";  // Remplacer "Login" par "Déconnexion"
+        buttonLogin.textContent = "Déconnexion";        // Remplacer "Login" par "Déconnexion"
         buttonLogin.addEventListener("click", logout);  // Ajouter l'écouteur de déconnexion
-    } else {
-        // Si pas de token, afficher "Login"
+    } else { // S'il ne l'est pas
         document.getElementById("edition-mode-bar").style.display = "none";  // Masquer la barre noire
         const listItemsLi = document.querySelectorAll("li");
         const buttonLogin = listItemsLi[2];
-        buttonLogin.textContent = "Login";  // Remettre le texte "Login"
+        buttonLogin.textContent = "Login";  // Remplacer "Déconnexion" par "Login"
     }
 });
 
 
-// fonction pour récupérer les données de l'API
+// FONCTION POUR : récupérer les données de l'API
 async function fetchWorks() {
     const reponse = await fetch("http://localhost:5678/api/works");
     galleryItems = await reponse.json();
     console.log(galleryItems);
-
     galleryContainer.innerHTML = '';
     console.log(galleryContainer);
 } 
 
 
-// fonction pour vider la galerie et insérer les données de l'API à la place
+// FONCTION POUR : insérer les données de l'API à la place de la galerie
 async function addElement(itemsToDisplay) {
     galleryContainer.innerHTML = '';
     
@@ -66,13 +101,12 @@ async function addElement(itemsToDisplay) {
 }
 
 
-// fonction pour créer des boutons de filtres
+// FONCTION POUR : créer les boutons de filtres
 async function newFilters() {
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "list-buttons-filters";
 
     const listCategories = new Set();
-
     listCategories.add("Tous");
     
     for (let i=0; i<galleryItems.length; i++) {
@@ -84,22 +118,19 @@ async function newFilters() {
         buttonFilters.textContent = category;
         buttonFilters.setAttribute("class", "buttons-to-filter");
 
-        // Lier un événement au clic sur chaque bouton
         buttonFilters.addEventListener("click", () => {
-            filterByCategories(category); // Passe la catégorie au filtre
+            filterByCategories(category);   // Passer la catégorie au filtre
         });
         
         buttonContainer.appendChild(buttonFilters);
     });
-    
+
     portfolioContainer.insertBefore(buttonContainer, titlePortfolioContainer.nextElementSibling);
 }
 
 
-// fonction pour trier la galerie en fonction du clic sur les boutons
+// FONCTION POUR : trier la galerie selon le clic sur les boutons
 async function filterByCategories(category) {
-    let filteredItems = [];
-
     if (category === "Tous") {
         filteredItems = galleryItems;
     } else {
@@ -110,15 +141,8 @@ async function filterByCategories(category) {
 }
 
 
-// fonction pour afficher la page de connexion
-// fonction pour revenir à la page d'accueil du site
+// FONCTION POUR : gérer la page de connexion 
 async function setButtonListener() {
-    const listItemsLi = document.querySelectorAll("li");
-
-    // Sélectionner l'élément en fonction de son index
-    const buttonLogin = listItemsLi[2];
-    const buttonProjet = listItemsLi[0];
-
     buttonLogin.addEventListener("click", () => {
         loginContainer.classList.remove("hidden");
         mainContainer.classList.add("hidden");
@@ -131,50 +155,33 @@ async function setButtonListener() {
 }
 
 
-// fonction pour se déconnecter 
+// FONCTION POUR : se déconnecter 
 function logout() {
-    // 1. Supprimer le token du localStorage
-    localStorage.removeItem("token");
+    localStorage.removeItem("token");   // supprimer le token
+    barreModeEdition.style.display = "none";    // masquer la barre noire
 
-    //2. Masquer la barre noire en haut de la page web
-    const blackBar = document.getElementById("edition-mode-bar");
-    blackBar.style.display = "none";
+    buttonLogin.textContent = "Login";  
+ 
+    buttonLogin.removeEventListener("click", logout);   // supprimer l'évènement "déconnexion"
 
-    //3. Remplacer "déconnexion" par "login"
-    const listItemsLi = document.querySelectorAll("li");
-    const buttonLogin = listItemsLi[2];
-    buttonLogin.textContent = "Login";
-
-    //4. Supprimer l'évènement "déconnexion" pour éviter les conflits
-    buttonLogin.removeEventListener("click", logout);
-
-    //5. rediriger l'utilisateur sur la page principale
     document.getElementById("login-container").style.display = "none";
     document.querySelector("main").style.display = "block";
-    location.reload();
 }
 
-// fonction pour récupérer les données du formulaire de connexion
+// FONCTION POUR : se connecter
 async function formResponse () {
-    const formContainer = document.querySelector("#login-container form");
-    const emailInput = document.getElementById("e-mail");
-    const passwordInput = document.getElementById("pass-word");
-    const submitButton = document.getElementById("submit-login");
-    const errorMessage = document.querySelector(".error-message"); // Sélectionner l'élément d'erreur correctement
-    
     // S'assurer que le DOM est bien chargé
     if (!formContainer || !emailInput || !passwordInput || !submitButton) {
         console.error("Un ou plusieurs éléments sont manquants dans le DOM.");
         return;
     }
 
-    // ajout de l'évènement au bouton de soumission
+    // Ajouter l'évènement au bouton de soumission
     formContainer.addEventListener("submit", async (event) => {
-        event.preventDefault();  // empêcher le rechargement de la page
+        event.preventDefault();  
         console.log("Evenement bouton : OK");
         
-        // récupération des données saisies par l'utilisateur
-        const usersData = { 
+        const usersData = {    // Récupérer les données saisies par l'utilisateur
             email: emailInput.value, 
             password: passwordInput.value
         };
@@ -182,41 +189,39 @@ async function formResponse () {
         // Réinitialiser les erreurs avant validation
         emailInput.classList.remove("input-error");
         passwordInput.classList.remove("input-error");
-        emailInput.placeholder = ""; // Réinitialiser le placeholder
-        passwordInput.placeholder = ""; // Réinitialiser le placeholder
-        errorMessage.style.display = "none";  // Réinitialiser le message d'erreur global
+        emailInput.placeholder = "";            // réinitialiser le placeholder    
+        passwordInput.placeholder = "";         // réinitialiser le placeholder
+        errorMessage.style.display = "none";    // réinitialiser le message d'erreur global
 
         let hasError = false;
 
         // Vérifier si les champs INPUT sont vides
         if (!usersData.email) {
             emailInput.classList.add("input-error");
-            emailInput.placeholder  = "Entrez votre adresse e-mail"; // info-bulle pour email
+            emailInput.placeholder  = "Entrez votre adresse e-mail"; 
             hasError = true;
         }
         if (!usersData.password) {
             passwordInput.classList.add("input-error");
-            passwordInput.placeholder  = "Entrez votre mot de passe"; // info-bulle pour mot de passe
+            passwordInput.placeholder  = "Entrez votre mot de passe";  
             hasError = true;
         }
 
-        // Si il y a une erreur, ne pas envoyer la requête
+        // Ne pas envoyer la requête s'il y a une erreur
         if (hasError) {
             return;
         }
 
-        // Désactiver le bouton pendant l'envoi
-        submitButton.disabled = true; 
+        submitButton.disabled = true;   // Désactiver le bouton pendant l'envoi
         
         try {
-            // appel de l'API avec les données
             const response = await fetch("http://localhost:5678/api/users/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(usersData)
             });
 
-            // vérifier la réponse HTTP
+            // Vérifier la réponse HTTP
             if (!response.ok) {
                 const textError = document.querySelector(".error-message");
                 if (textError) {
@@ -225,41 +230,37 @@ async function formResponse () {
                 return;
             }
             
-            // récupérer la réponse JSON
+            // Récupérer la réponse JSON
             const dataForm = await response.json();
             console.log("Réponse API reçue :", dataForm);
 
-            // vérifier que l'API renvoie un token
+            // Vérifier si l'API renvoie un token
             if (dataForm.token) {
-                localStorage.setItem("token", dataForm.token); // sauvegarder le token
+                localStorage.setItem("token", dataForm.token);   // sauvegarder le token
                 
-                // rediriger l'utilisateur lorsque la connexion a réussie
+                // Rediriger l'utilisateur lorsque la connexion a réussie
                 document.getElementById("login-container").style.display = "none";
                 document.querySelector("main").style.display = "block";
 
-                const barreModeEdition = document.getElementById("edition-mode-bar");
                 barreModeEdition.style.display = "flex";
+                
+                buttonLogin.textContent = "Déconnexion";       // remplacer "login" par "déconnexion"
+                buttonLogin.addEventListener("click", logout); // ajouter un écouteur d'événement pour la déconnexion
 
-                const listItemsLi = document.querySelectorAll("li");
-                const buttonLogin = listItemsLi[2];
-                // Remplacer le texte de "login" par "Déconnexion"
-                buttonLogin.textContent = "Déconnexion";
-                buttonLogin.addEventListener("click", logout); // Ajoute un écouteur d'événement pour la déconnexion
-
-                location.reload();
+                location.reload();  
             } 
         } catch (error) {
             console.error("Erreur :", error);
-            alert("Une erreur est survenue lors de la connexion.");
+            errorMessage.style.display = "block"; 
+            return;
         } finally {
-            // Réactiver le bouton après réception de la réponse
-            submitButton.disabled = false; 
+            submitButton.disabled = false;   // Réactiver le bouton après réception de la réponse
         }
     });
 }
 
 
-// fonction pour créer le lien pur ouvrir la boite modale
+// FONCTION POUR : créer le lien pour ouvrir la boite modale
 function createModalLink() {
     // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
     const modalLink = document.createElement("a");
@@ -287,7 +288,6 @@ function createModalLink() {
     const modalLinkContainer = document.createElement("div");
     modalLinkContainer.setAttribute("class", "container-modalLink");
 
-    // ÉTAPE 4 : ajouter le lien et le titre dans la div
     modalLinkContainer.appendChild(titlePortfolioContainer);
     modalLinkContainer.appendChild(iconeLinkContainer);
 
@@ -321,49 +321,41 @@ function createModalLink() {
 }
 
 
-// fonction pour gérer les images dans la boite modale
+// FONCTION POUR : gérer les images dans la boite modale
 function picturesModalBox() {
-    const modalBoxContainer = document.getElementById("container-modal-box");
-    const picturesContainerInModal = modalBoxContainer.querySelector(".container-pictures-modal");
+    const picturesContainerInModal = firstModalBox.querySelector(".container-pictures-modal");
     const picturesInGallery = document.querySelectorAll(".img-in-gallery");
 
-    // vérifier si les images existent dans la galerie et les cloner
+    // Vérifier si les images existent dans la galerie et les cloner
     if (picturesInGallery.length > 0) {
         picturesInGallery.forEach(picture => {
-            // Cloner l'image et lui ajouyer une classe
             const clonePicture = picture.cloneNode(true);
             clonePicture.classList.add("pictures-in-modal-box");
-
-            // Récupérer le titre de l'image depuis le <figcaption>
-            const caption = picture.querySelector("figcaption").textContent;
+            const caption = picture.querySelector("figcaption").textContent;   // récupérer le titrre de l'image
 
             // Créer une DIV pour contenir l'image et le bouton de suppression
             const containerDeleteButton = document.createElement("div");
-            containerDeleteButton.classList.add("container-delete-button"); // Classe pour la div contenant l'image et le bouton
-
-            // Ajouter l'image clonée dans cette div
+            containerDeleteButton.classList.add("container-delete-button"); 
             containerDeleteButton.appendChild(clonePicture);
 
             // Créer le bouton poubelle (icône)
             const deleteButton = document.createElement("button");
-            deleteButton.classList.add("delete-button"); // Classe pour le bouton
-            deleteButton.innerHTML = "<i class='fa-solid fa-trash-can'></i>"; // Icône poubelle (si vous utilisez FontAwesome)
+            deleteButton.classList.add("delete-button"); 
+            deleteButton.innerHTML = "<i class='fa-solid fa-trash-can'></i>"; 
 
-            // Ajouter l'événement pour supprimer l'image lorsqu'on clique sur le bouton
+            // Ajouter l'événement pour supprimer l'image 
             deleteButton.addEventListener("click", async () => {
                 // Afficher la boîte de confirmation
                 document.getElementById("confirmationBox").style.display = "block";
                 
-
-                // Ajouter un événement au bouton "Oui" qui supprimera cette image spécifique
+                // OUI (on supprime)
                 document.getElementById("confirmDelete").onclick = async function () {
-                    // Passer le titre à la fonction de suppression
-                    await deleteImageAPI(caption, containerDeleteButton); // Passer le titre pour récupérer l'ID et supprimer l'image
-                    document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
+                    await deleteImageAPI(caption, containerDeleteButton);                // passer le titre à la fonction de suppression
+                    document.getElementById("confirmationBox").style.display = "none";   // cacher la confirmation
                 }
-                // Annuler la suppression
+                // NONE (on ne supprime pas)
                 document.getElementById("cancelDelete").onclick = function () {
-                    document.getElementById("confirmationBox").style.display = "none"; // Cacher la confirmation
+                    document.getElementById("confirmationBox").style.display = "none";   // cacher la confirmation
                 };
             });
 
@@ -379,15 +371,13 @@ function picturesModalBox() {
 }
 
 
-// fonction pour supprimer une image dans l'API
+// FONCTION POUR : supprimer une image dans l'API
 async function deleteImageAPI(imageTitle, containerDeleteButton) {
-    const errorInModal = document.querySelector(".error-message-modale");
-    errorInModal.style.display = "none";
+    errorInModal.style.display = "none";   // cacher le message d'erreur par défaut
 
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("erreur-in-modal2");
-    const modalOne = document.getElementById("container-modal-box");
+    tokenIsNone.classList.add("erreur-message-in-modal");
 
     try {
         // Appel à l'API pour récupérer la liste des images
@@ -403,7 +393,7 @@ async function deleteImageAPI(imageTitle, containerDeleteButton) {
             const token = localStorage.getItem("token");
 
             if (!token) {
-                modalOne.appendChild(tokenIsNone);
+                firstModalBox.appendChild(tokenIsNone);
                 return;
             }
 
@@ -416,53 +406,40 @@ async function deleteImageAPI(imageTitle, containerDeleteButton) {
             });
 
             if (deleteResponse.ok) {
-                // supprimer la div contenant l'image et le bouton
-                containerDeleteButton.remove();
-                errorInModal.style.display = "none"; // cacher le message d'erreur par défaut
+                containerDeleteButton.remove();       // supprimer la div contenant l'image et le bouton
+                errorInModal.style.display = "none";  // cacher le message d'erreur par défaut
 
                 // Sélectionner l'image correspondante dans la galerie du DOM
                 const imageElementDom = document.querySelector(`.gallery img[alt='${imageTitle}']`);
                 if (imageElementDom) {
-                    // Supprimer l'élément image de la galerie
-                    imageElementDom.closest('figure').remove();
+                    imageElementDom.closest('figure').remove();   // Supprimer l'élément image de la galerie
                 }
                 
                 // Fermer la boîte modale après suppression
-                const boiteModale = document.getElementById("container-modal-box");
-                const bodyContainer = document.body;
-                boiteModale.style.display = "none";
-                boiteModale.setAttribute("aria-hidden", "true");
+                firstModalBox.style.display = "none";
+                firstModalBox.setAttribute("aria-hidden", "true");
                 bodyContainer.style.backgroundColor = "";
                 bodyContainer.style.overflow = "";
             } else {
-                errorInModal.style.display = "block";
+                errorInModal.style.display = "block";   // afficher le message d'erreur
             }
         } else {
-            errorInModal.style.display = "block";
+            errorInModal.style.display = "block";       // afficher le message d'erreur
         }
     } catch (error) {
-        errorInModal.style.display = "block";
+        errorInModal.style.display = "block";           // afficher le message d'erreur
     }
 }
 
 
-// fonction pour gérer les boites modales
+// FONCTION POUR : gérer les boites modales
 function gestionModalBox() {
-    let firstModalBox = document.getElementById("container-modal-box");
-    let secondModalBox = document.getElementById("container-modal-box2");
-    const bodyContainer = document.body;
-    const modalContent1 = firstModalBox.querySelector(".modal-container");
-    const modalContent2 = secondModalBox.querySelector(".modal-container2");
-    const buttonToGoBack = document.querySelector(".button-go-back");
-    const buttonAddPictures = document.querySelector(".button-add-pictures");
-
-    // VERIFIER L'EXISTENCE DES MODALES
+    // Vérifier l'existence des modales
     if (!firstModalBox || !secondModalBox) {
         console.error("Au moins une des boites modales n'existe pas !");
         return;
     }
 
-    // FERMER UNE MODALE
     function closeModalBox(modalBox) {
         if (!modalBox) return;
         modalBox.style.display = "none";
@@ -476,7 +453,6 @@ function gestionModalBox() {
         }
     }
 
-    // OUVRIR UNE MODALE
     function openModalBox(modalBox) {
         if (!modalBox) return;
         modalBox.style.display = "block";
@@ -493,23 +469,22 @@ function gestionModalBox() {
     document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
         a.addEventListener("click", function(event) {
             openModalBox(firstModalBox);
-            // Empêcher cet événement de se propager au document, refermant la modale en même temps qu'il ne l'ouvre
-            event.stopPropagation();  
-        });
+            event.stopPropagation();   // Empêcher cet événement de se propager au document
+        });                            // (sinon la boite modale se ferme lorsqu'elle s'ouvre)
     });
 
     // OUVRIR la 2è boite modale
-    firstModalBox.querySelector(".button-add-pictures").addEventListener("click", function(event) {
+    buttonAddPictures.addEventListener("click", function(event) {
         closeModalBox(firstModalBox);
         openModalBox(secondModalBox);
         event.stopPropagation();
     });
 
-    // FERMER LES BOITES
+    // FERMER les boites modales
     firstModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(firstModalBox));
     secondModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(secondModalBox));
 
-    // EMPÊCHER LA FERMETURE SI ON CLIQUE DANS LA BOITE
+    // EMPÊCHER LA FERMETURE si on clique dans la boite modale
     modalContent1.addEventListener("click", function(event) {
         event.stopPropagation();
     });
@@ -517,7 +492,7 @@ function gestionModalBox() {
         event.stopPropagation();
     });
 
-    // FERMER LES MODALES SI ON CLIQUE EN DEHORS
+    // FERMER les boites modales si on clique à l'extérieur
     document.addEventListener("click", function(event) { 
         if (
             firstModalBox.style.display === "block" && !firstModalBox.contains(event.target)
@@ -531,7 +506,7 @@ function gestionModalBox() {
         }
     });
 
-    // PASSAGE de la 2è à la 1è modale
+    // PASSAGE de la 2è à la 1è boite modale
     buttonToGoBack.addEventListener("click", function(event) {
         closeModalBox(secondModalBox);
         openModalBox(firstModalBox);
@@ -541,19 +516,10 @@ function gestionModalBox() {
 }
 
 
-// fonction pour ajouter des images via la modale
+// FONCTION POUR : ajouter des images via la modale
 async function addPictutesInModal() {
-    const containerToSelectPictures = document.querySelector(".square-to-add-pictures");
-    const iconeOfPictures = document.querySelector(".icone-in-square");
-    const buttonToSelectPictures = document.querySelector(".button-load-pictures");
-    const fileInput = document.getElementById("file-input-modal");
-    const textSubtitle = document.querySelector(".subtitle-info");
-    let imageDescription = document.getElementById("text-title-pictures-modal");
-    let imageCategory = document.querySelector(".add-puctures-category");
-    let buttonToSave = document.querySelector(".button-to-save");
-    
     // ÉTAPE 1 : afficher l'image sélectionnée
-    fileInput.addEventListener("change", function (event) {
+    imageInput.addEventListener("change", function (event) {
         // Récupérer le premier fichier sélectionné
         const fileSelected = event.target.files[0];
         
@@ -577,7 +543,7 @@ async function addPictutesInModal() {
 
     // fonction pour ACTIVER/DESACTIVER le bouton
     function activButtonToSave() {
-        if (fileInput.files.length > 0 && imageCategory.value.trim() !== "" && imageDescription.value !== "") {
+        if (imageInput.files.length > 0 && imageCategory.value.trim() !== "" && imageDescription.value !== "") {
             buttonToSave.style.backgroundColor = "#1D6154";
             buttonToSave.style.border = "solid 2px #1D6154"
             buttonToSave.style.color = "white";
@@ -590,14 +556,14 @@ async function addPictutesInModal() {
     // ajouter des écouteurs d'événements pour activer ou désactiver le bouton
     imageDescription.addEventListener("input", activButtonToSave);
     imageCategory.addEventListener("change", activButtonToSave);
-    fileInput.addEventListener("change", activButtonToSave);
+    imageInput.addEventListener("change", activButtonToSave);
 
     // s'assurer que le bouton est bien désactivé initialement
     activButtonToSave();
 }
 
 
-// Fonction pour redimensionner une image
+// FONCTION POUR : redimensionner une image
 function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -650,51 +616,46 @@ function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
     });
 }
 
-// fonctio,n pour envoyer une nouvelle image à l'API
+// FONCTION POUR : envoyer une nouvelle image à l'API
 async function addImageApi(event) {
     event.preventDefault();
     
-    // Récupération des éléments
-    const inputText = document.getElementById("text-title-pictures-modal");
-    const imageSelect = document.getElementById("file-input-modal");
-    const selectOption = document.querySelector(".add-puctures-category");
     const token = localStorage.getItem("token");
-    const modalTwo = document.getElementById("container-modal-box2");
-    const errorInModal = document.querySelector(".error-message-modale");
 
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("erreur-in-modal2");
+    tokenIsNone.classList.add("erreur-message-in-modal");
+
     const errorApi = document.createElement("p");
     errorApi.textContent = "Ajout de l'image impossible !";
-    errorApi.classList.add("erreur-in-modal2");
+    errorApi.classList.add("erreur-message-in-modal");
 
     let categoryId;
     
     // Vérification du token
     if (!token) {
-        modalTwo.appendChild(tokenIsNone);
+        secondModalBox.appendChild(tokenIsNone);
         return;
     }
     
     // Vérification des champs requis
-    if (!inputText.value.trim() || !selectOption.value || !imageSelect.files[0]) {
+    if (!imageDescription.value.trim() || !imageCategory.value || !imageInput.files[0]) {
         return;
     }
     
     // Définir categoryId basé sur la sélection
-    if (selectOption.value === "Objets") {
+    if (imageCategory.value === "Objets") {
         categoryId = 1;
-    } else if (selectOption.value === "Appartements") {
+    } else if (imageCategory.value === "Appartements") {
         categoryId = 2;
-    } else if (selectOption.value === "Hotels & restaurants") {
+    } else if (imageCategory.value === "Hotels & restaurants") {
         categoryId = 4;
     }
 
     console.log("Catégorie sélectionnée :", categoryId);
-    console.log("Titre :", inputText.value.trim());
+    console.log("Titre :", imageDescription.value.trim());
 
-    const file = imageSelect.files[0]; // récupérer le fichier sléctionné
+    const file = imageInput.files[0]; // récupérer le fichier sléctionné
     console.log("Image récupérée : ", file);
 
     try {
@@ -713,7 +674,7 @@ async function addImageApi(event) {
 
         // Création du FormData avec les noms de champs exacts
         const formData = new FormData();
-        formData.append('title', inputText.value.trim());
+        formData.append('title', imageDescription.value.trim());
         formData.append('category', categoryId);
         formData.append('image', renamedFile);
         
@@ -769,7 +730,7 @@ async function addImageApi(event) {
             stack: error.stack,
             type: error.name
         });
-        modalTwo.appendChild(errorInModal);
+        secondModalBox.appendChild(errorInModal);
     }
 }
 
