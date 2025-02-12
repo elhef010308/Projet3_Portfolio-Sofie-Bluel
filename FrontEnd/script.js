@@ -783,7 +783,7 @@ function keyboardGestion() {
                 bodyContainer.style.overflow = "";
             }
         }
-    })
+    });
 }
 
 

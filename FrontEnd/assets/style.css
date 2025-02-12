@@ -107,13 +107,10 @@ nav li {
 
 li:hover {
 	color: #B1663C;
-	font-weight: 700;
 }
 
 li:focus {
 	color: #B1663C;
-	padding: 0 0 3px 0;
-	font-weight: 700;
 	outline: none;      /* Supprimer le contour par défaut */
 }
 
