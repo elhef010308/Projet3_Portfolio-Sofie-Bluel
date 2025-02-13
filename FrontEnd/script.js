@@ -157,7 +157,7 @@ async function setButtonListener() {
 
 // FONCTION POUR : se déconnecter 
 function logout() {
-    localStorage.removeItem("token");   // supprimer le token
+    localStorage.removeItem("token");           // supprimer le token
     barreModeEdition.style.display = "none";    // masquer la barre noire
 
     buttonLogin.textContent = "Login";  
@@ -167,6 +167,7 @@ function logout() {
     document.getElementById("login-container").style.display = "none";
     document.querySelector("main").style.display = "block";
 }
+
 
 // FONCTION POUR : se connecter
 async function formResponse () {
@@ -353,7 +354,7 @@ function picturesModalBox() {
                     await deleteImageAPI(caption, containerDeleteButton);                // passer le titre à la fonction de suppression
                     document.getElementById("confirmationBox").style.display = "none";   // cacher la confirmation
                 }
-                // NONE (on ne supprime pas)
+                // NON (on ne supprime pas)
                 document.getElementById("cancelDelete").onclick = function () {
                     document.getElementById("confirmationBox").style.display = "none";   // cacher la confirmation
                 };
@@ -377,7 +378,7 @@ async function deleteImageAPI(imageTitle, containerDeleteButton) {
 
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("erreur-message-in-modal");
+    tokenIsNone.classList.add("erreur-in-modal2");
 
     try {
         // Appel à l'API pour récupérer la liste des images
@@ -624,11 +625,11 @@ async function addImageApi(event) {
 
     const tokenIsNone = document.createElement("p");
     tokenIsNone.textContent = "Veuillez vous identifier !";
-    tokenIsNone.classList.add("erreur-message-in-modal");
+    tokenIsNone.classList.add("erreur-in-modal2");
 
     const errorApi = document.createElement("p");
     errorApi.textContent = "Ajout de l'image impossible !";
-    errorApi.classList.add("erreur-message-in-modal");
+    errorApi.classList.add("erreur-in-modal2");
 
     let categoryId;
     
