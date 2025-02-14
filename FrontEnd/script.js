@@ -736,57 +736,6 @@ async function addImageApi(event) {
 }
 
 
-// FONCTION POUR : gérer la page via le clavier
-function keyboardGestion() {
-    document.addEventListener("keydown", function(event) {
-        let activeElement = document.activeElement; // élément actuellement focusé
-
-        if (event.key === "Tab") {
-            // Sélectionner tous les éléments focussables
-            let focusables = document.querySelectorAll(
-                "button, a, input, textarea, select, li[tabindex='0'])"
-            ); 
-
-            if (focusables.length === 0) return;
-
-            let first = focusables[0]; // premier élément focusable
-            let last = focusables[focusables.length - 1]; // dernier élément focusable
-
-            if (event.shiftKey) {  // si SHIFT + TAB est pressé
-                if (activeElement === first) {
-                    event.preventDefault(); // empêcher le comportement normal de TAB
-                    last.focus();           // déplacer le focus au dernier élément
-                }
-            } else {               // Si seulement TAB est pressé
-                if (activeElement === last) {
-                    event.preventDefault(); // empêcher le comportement normal de TAB
-                    first.focus();          // déplacer le focus au premier élément
-                }
-            }
-        }
-
-        if (event.key === "Escape") {
-            // Fermer la première modal si elle est ouverte
-            if (firstModalBox && firstModalBox.getAttribute("aria-hidden") === "false") {
-                firstModalBox.style.display = "none";
-                firstModalBox.setAttribute("aria-hidden", "true");
-                firstModalBox.getAttribute("aria-modal", "true");
-                bodyContainer.style.backgroundColor = "";   
-                bodyContainer.style.overflow = "";
-            }
-
-            // Fermer la deuxième modal si elle est ouverte
-            if (secondModalBox && secondModalBox.getAttribute("aria-hidden") === "false") {
-                secondModalBox.style.display = "none";
-                secondModalBox.setAttribute("aria-hidden", "true");
-                secondModalBox.getAttribute("aria-modal", "true");
-                bodyContainer.style.backgroundColor = "";   
-                bodyContainer.style.overflow = "";
-            }
-        }
-    });
-}
-
 
 fetchWorks().then(() => {
     addElement(galleryItems);
@@ -796,7 +745,6 @@ fetchWorks().then(() => {
     picturesModalBox();    // ajouter les images à la boite modale
     gestionModalBox();
     addPictutesInModal();
-    keyboardGestion();
 });
 
 // Appel de la fonction lorsque le DOM est chargé
