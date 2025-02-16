@@ -47,25 +47,6 @@ let imageCategory = document.querySelector(".add-puctures-category");
 let buttonToSave = document.querySelector(".button-to-save");
 
 
-// FONCTION POUR : vérifier la présence du token lors du rechargement de la page
-window.addEventListener("load", () => {
-    const token = localStorage.getItem("token");
-
-    if (token) { // Si l'utilisateur est connecté
-        document.getElementById("edition-mode-bar").style.display = "flex";  // Afficher la barre noire
-        const listItemsLi = document.querySelectorAll("li");
-        const buttonLogin = listItemsLi[2];
-        buttonLogin.textContent = "Déconnexion";        // Remplacer "Login" par "Déconnexion"
-        buttonLogin.addEventListener("click", logout);  // Ajouter l'écouteur de déconnexion
-    } else { // S'il ne l'est pas
-        document.getElementById("edition-mode-bar").style.display = "none";  // Masquer la barre noire
-        const listItemsLi = document.querySelectorAll("li");
-        const buttonLogin = listItemsLi[2];
-        buttonLogin.textContent = "Login";  // Remplacer "Déconnexion" par "Login"
-    }
-});
-
-
 // FONCTION POUR : récupérer les données de l'API
 async function fetchWorks() {
     const reponse = await fetch("http://localhost:5678/api/works");
@@ -73,7 +54,7 @@ async function fetchWorks() {
     console.log(galleryItems);
     galleryContainer.innerHTML = '';
     console.log(galleryContainer);
-} 
+}
 
 
 // FONCTION POUR : insérer les données de l'API à la place de la galerie
@@ -152,20 +133,6 @@ async function setButtonListener() {
         loginContainer.classList.add("hidden");
         mainContainer.classList.remove("hidden");
     });
-}
-
-
-// FONCTION POUR : se déconnecter 
-function logout() {
-    localStorage.removeItem("token");           // supprimer le token
-    barreModeEdition.style.display = "none";    // masquer la barre noire
-
-    buttonLogin.textContent = "Login";  
- 
-    buttonLogin.removeEventListener("click", logout);   // supprimer l'évènement "déconnexion"
-
-    document.getElementById("login-container").style.display = "none";
-    document.querySelector("main").style.display = "block";
 }
 
 
@@ -261,6 +228,40 @@ async function formResponse () {
 }
 
 
+// FONCTION POUR : se déconnecter 
+function logout() {
+    localStorage.removeItem("token");           // supprimer le token
+    barreModeEdition.style.display = "none";    // masquer la barre noire
+
+    buttonLogin.textContent = "Login";  
+ 
+    buttonLogin.removeEventListener("click", logout);   // supprimer l'évènement "déconnexion"
+
+    document.getElementById("login-container").style.display = "none";
+    document.querySelector("main").style.display = "block";
+}
+
+
+// FONCTION POUR : vérifier la présence du token lors du rechargement de la page
+window.addEventListener("load", () => {
+    const token = localStorage.getItem("token");
+
+    if (token) { // Si l'utilisateur est connecté
+        document.getElementById("edition-mode-bar").style.display = "flex";  // Afficher la barre noire
+        const listItemsLi = document.querySelectorAll("li");
+        const buttonLogin = listItemsLi[2];
+        buttonLogin.textContent = "Déconnexion";        // Remplacer "Login" par "Déconnexion"
+        buttonLogin.addEventListener("click", logout);  // Ajouter l'écouteur de déconnexion
+    } else { // S'il ne l'est pas
+        document.getElementById("edition-mode-bar").style.display = "none";  // Masquer la barre noire
+        const listItemsLi = document.querySelectorAll("li");
+        const buttonLogin = listItemsLi[2];
+        buttonLogin.textContent = "Login";  // Remplacer "Déconnexion" par "Login"
+    }
+});
+
+
+
 // FONCTION POUR : créer le lien pour ouvrir la boite modale
 function createModalLink() {
     // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
@@ -319,6 +320,90 @@ function createModalLink() {
     modalLinkContainer.style.alignItems = "center"; 
     modalLinkContainer.style.justifyContent = "center";
     modalLinkContainer.style.gap = "30px";
+}
+
+
+// FONCTION POUR : gérer les boites modales
+function gestionModalBox() {
+    // Vérifier l'existence des modales
+    if (!firstModalBox || !secondModalBox) {
+        console.error("Au moins une des boites modales n'existe pas !");
+        return;
+    }
+
+    function closeModalBox(modalBox) {
+        if (!modalBox) return;
+        modalBox.style.display = "none";
+        modalBox.setAttribute("aria-hidden", "true");
+        modalBox.getAttribute("aria-modal", "true");
+
+        // Retirer le fond gris et réactiver le scroll du body
+        if (firstModalBox.style.display !== "block" && secondModalBox.style.display !== "block") {
+            bodyContainer.style.backgroundColor = "";   
+            bodyContainer.style.overflow = "";
+        }
+    }
+
+    function openModalBox(modalBox) {
+        if (!modalBox) return;
+        modalBox.style.display = "block";
+        modalBox.setAttribute("aria-hidden", "false");
+        modalBox.removeAttribute("aria-modal");
+        buttonAddPictures.removeAttribute("disabled");
+
+        // Activer le fond gris et désactiver le scroll du body
+        bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+        bodyContainer.style.overflow = "hidden"; 
+    }
+
+    // OUVRIR la 1è boite modale
+    document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
+        a.addEventListener("click", function(event) {
+            openModalBox(firstModalBox);
+            event.stopPropagation();   // Empêcher cet événement de se propager au document
+        });                            // (sinon la boite modale se ferme lorsqu'elle s'ouvre)
+    });
+
+    // OUVRIR la 2è boite modale
+    buttonAddPictures.addEventListener("click", function(event) {
+        closeModalBox(firstModalBox);
+        openModalBox(secondModalBox);
+        event.stopPropagation();
+    });
+
+    // FERMER les boites modales
+    firstModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(firstModalBox));
+    secondModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(secondModalBox));
+
+    // EMPÊCHER LA FERMETURE si on clique dans la boite modale
+    modalContent1.addEventListener("click", function(event) {
+        event.stopPropagation();
+    });
+    modalContent2.addEventListener("click", function(event) {
+        event.stopPropagation();
+    });
+
+    // FERMER les boites modales si on clique à l'extérieur
+    document.addEventListener("click", function(event) { 
+        if (
+            firstModalBox.style.display === "block" && !firstModalBox.contains(event.target)
+        ) {
+            closeModalBox(firstModalBox);
+        }
+        if (
+            secondModalBox.style.display === "block" && !secondModalBox.contains(event.target)
+        ) {
+            closeModalBox(secondModalBox);
+        }
+    });
+
+    // PASSAGE de la 2è à la 1è boite modale
+    buttonToGoBack.addEventListener("click", function(event) {
+        closeModalBox(secondModalBox);
+        openModalBox(firstModalBox);
+        event.stopPropagation();
+        event.preventDefault();
+    });
 }
 
 
@@ -433,90 +518,6 @@ async function deleteImageAPI(imageTitle, containerDeleteButton) {
 }
 
 
-// FONCTION POUR : gérer les boites modales
-function gestionModalBox() {
-    // Vérifier l'existence des modales
-    if (!firstModalBox || !secondModalBox) {
-        console.error("Au moins une des boites modales n'existe pas !");
-        return;
-    }
-
-    function closeModalBox(modalBox) {
-        if (!modalBox) return;
-        modalBox.style.display = "none";
-        modalBox.setAttribute("aria-hidden", "true");
-        modalBox.getAttribute("aria-modal", "true");
-
-        // Retirer le fond gris et réactiver le scroll du body
-        if (firstModalBox.style.display !== "block" && secondModalBox.style.display !== "block") {
-            bodyContainer.style.backgroundColor = "";   
-            bodyContainer.style.overflow = "";
-        }
-    }
-
-    function openModalBox(modalBox) {
-        if (!modalBox) return;
-        modalBox.style.display = "block";
-        modalBox.setAttribute("aria-hidden", "false");
-        modalBox.removeAttribute("aria-modal");
-        buttonAddPictures.removeAttribute("disabled");
-
-        // Activer le fond gris et désactiver le scroll du body
-        bodyContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
-        bodyContainer.style.overflow = "hidden"; 
-    }
-
-    // OUVRIR la 1è boite modale
-    document.querySelectorAll(".link-to-open-modal-box").forEach(a => {
-        a.addEventListener("click", function(event) {
-            openModalBox(firstModalBox);
-            event.stopPropagation();   // Empêcher cet événement de se propager au document
-        });                            // (sinon la boite modale se ferme lorsqu'elle s'ouvre)
-    });
-
-    // OUVRIR la 2è boite modale
-    buttonAddPictures.addEventListener("click", function(event) {
-        closeModalBox(firstModalBox);
-        openModalBox(secondModalBox);
-        event.stopPropagation();
-    });
-
-    // FERMER les boites modales
-    firstModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(firstModalBox));
-    secondModalBox.querySelector(".button-close-modal").addEventListener("click", () => closeModalBox(secondModalBox));
-
-    // EMPÊCHER LA FERMETURE si on clique dans la boite modale
-    modalContent1.addEventListener("click", function(event) {
-        event.stopPropagation();
-    });
-    modalContent2.addEventListener("click", function(event) {
-        event.stopPropagation();
-    });
-
-    // FERMER les boites modales si on clique à l'extérieur
-    document.addEventListener("click", function(event) { 
-        if (
-            firstModalBox.style.display === "block" && !firstModalBox.contains(event.target)
-        ) {
-            closeModalBox(firstModalBox);
-        }
-        if (
-            secondModalBox.style.display === "block" && !secondModalBox.contains(event.target)
-        ) {
-            closeModalBox(secondModalBox);
-        }
-    });
-
-    // PASSAGE de la 2è à la 1è boite modale
-    buttonToGoBack.addEventListener("click", function(event) {
-        closeModalBox(secondModalBox);
-        openModalBox(firstModalBox);
-        event.stopPropagation();
-        event.preventDefault();
-    });
-}
-
-
 // FONCTION POUR : ajouter des images via la modale
 async function addPictutesInModal() {
     // ÉTAPE 1 : afficher l'image sélectionnée
@@ -563,59 +564,6 @@ async function addPictutesInModal() {
     activButtonToSave();
 }
 
-
-// FONCTION POUR : redimensionner une image
-function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            img.src = e.target.result;
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-
-        img.onload = function () {
-            let width = img.width;
-            let height = img.height;
-
-            // Vérifier si l'image a besoin d'être redimensionnée
-            if (width <= maxWidth && height <= maxHeight) {
-                return resolve(file); // Retourne l'original si pas besoin de redimensionner
-            }
-
-            // Calculer les nouvelles dimensions en respectant le ratio
-            if (width > maxWidth) {
-                height *= maxWidth / width;
-                width = maxWidth;
-            }
-            if (height > maxHeight) {
-                width *= maxHeight / height;
-                height = maxHeight;
-            }
-
-            // Création du canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Convertir en Blob et retourner l'image redimensionnée
-            canvas.toBlob(blob => {
-                if (blob) {
-                    resolve(blob);
-                } else {
-                    reject(new Error("Erreur lors de la conversion de l'image"));
-                }
-            }, 'image/jpeg', quality);
-        };
-
-        img.onerror = reject;
-    });
-}
 
 // FONCTION POUR : envoyer une nouvelle image à l'API
 async function addImageApi(event) {
@@ -733,6 +681,60 @@ async function addImageApi(event) {
         });
         secondModalBox.appendChild(errorInModal);
     }
+}
+
+
+// FONCTION POUR : redimensionner une image
+function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            img.src = e.target.result;
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+
+        img.onload = function () {
+            let width = img.width;
+            let height = img.height;
+
+            // Vérifier si l'image a besoin d'être redimensionnée
+            if (width <= maxWidth && height <= maxHeight) {
+                return resolve(file); // Retourne l'original si pas besoin de redimensionner
+            }
+
+            // Calculer les nouvelles dimensions en respectant le ratio
+            if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+            }
+            if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
+            }
+
+            // Création du canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convertir en Blob et retourner l'image redimensionnée
+            canvas.toBlob(blob => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error("Erreur lors de la conversion de l'image"));
+                }
+            }, 'image/jpeg', quality);
+        };
+
+        img.onerror = reject;
+    });
 }
 
 
