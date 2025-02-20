@@ -470,11 +470,38 @@ async function addPictutesInModal() {
     imageInput.addEventListener("change", function (event) {
         // Récupérer le premier fichier sélectionné
         const fileSelected = event.target.files[0];
+        const errorMessage = document.querySelector(".subtitle-info"); // Sélection du <p> existant
         
-        // Vérifier s'il s'agit bien d'un fichier de type "image/png" ou "image/jpeg"
-        if (!fileSelected || !fileSelected.type.startsWith("image/")) {
+        // Vérifier si un fichier a été sélectionné
+        if (!fileSelected) {
             return;
         }
+
+        // Vérifier la taille du fichier (4 Mo max)
+        if (fileSelected.size > 4 * 1024 * 1024) {
+            errorMessage.textContent = "L'image ne doit pas dépasser 4mo !";
+            errorMessage.style.color = "rgb(184, 1, 1)";
+            errorMessage.style.fontWeight = "600";
+            errorMessage.style.fontSize = "15px"
+            imageInput.value = ""; // Réinitialiser l'input
+            return;
+        }
+
+        // Vérifier le format du fichier (JPG ou PNG uniquement)
+        const allowedFormats = ["image/jpeg", "image/png"];
+        if (!allowedFormats.includes(fileSelected.type)) {
+            errorMessage.textContent = "L'image doit être un fichier JPG ou PNG !";
+            errorMessage.style.color = "rgb(184, 1, 1)";
+            errorMessage.style.fontWeight = "600";
+            errorMessage.style.fontSize = "15px"
+            imageInput.value = ""; // Réinitialiser l'input
+            return;
+        }
+
+        // Si tout est bon, remettre le message par défaut
+        errorMessage.textContent = "jpg, png : 4mo max";
+        errorMessage.style.color = ""; // Remettre la couleur par défaut
+        errorMessage.style.fontWeight = ""; // Remettre le texte normal
 
         // ÉTAPE 2 : Créer l'élément <img> et afficher l'image sélectionnée
         const imageSelected = document.createElement("img");
@@ -554,24 +581,11 @@ async function addImageApi(event) {
     console.log("Image récupérée : ", file);
 
     try {
-        // Redimensionnement de l'image
-        const resizedImage = await resizeImage(file);
-        
-        // Vérification du type de resizedImage
-        if (!(resizedImage instanceof Blob)) {
-            console.error("Le fichier redimensionné n'est pas un Blob");
-            return;
-        }
-
-        // Créer un nouveau nom de fichier pour l'image redimensionnée
-        const newFileName = "resized_image.jpg"; // Nouveau nom de fichier
-        const renamedFile = new File([resizedImage], newFileName, { type: "image/jpeg" });
-
         // Création du FormData avec les noms de champs exacts
         const formData = new FormData();
         formData.append('title', imageDescription.value.trim());
         formData.append('category', categoryId);
-        formData.append('image', renamedFile);
+        formData.append('image', file);
         
         // Vérification des données à envoyer
         console.log("FormData envoyé :");
@@ -627,60 +641,6 @@ async function addImageApi(event) {
         });
         secondModalBox.appendChild(errorInModal);
     }
-}
-
-
-// FONCTION POUR : redimensionner une image
-function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            img.src = e.target.result;
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-
-        img.onload = function () {
-            let width = img.width;
-            let height = img.height;
-
-            // Vérifier si l'image a besoin d'être redimensionnée
-            if (width <= maxWidth && height <= maxHeight) {
-                return resolve(file); // Retourne l'original si pas besoin de redimensionner
-            }
-
-            // Calculer les nouvelles dimensions en respectant le ratio
-            if (width > maxWidth) {
-                height *= maxWidth / width;
-                width = maxWidth;
-            }
-            if (height > maxHeight) {
-                width *= maxHeight / height;
-                height = maxHeight;
-            }
-
-            // Création du canvas
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Convertir en Blob et retourner l'image redimensionnée
-            canvas.toBlob(blob => {
-                if (blob) {
-                    resolve(blob);
-                } else {
-                    reject(new Error("Erreur lors de la conversion de l'image"));
-                }
-            }, 'image/jpeg', quality);
-        };
-
-        img.onerror = reject;
-    });
 }
 
 
