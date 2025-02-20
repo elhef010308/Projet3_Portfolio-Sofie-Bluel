@@ -452,6 +452,8 @@ async function deleteImageAPI(imageTitle, containerDeleteButton) {
                 firstModalBox.setAttribute("aria-hidden", "true");
                 bodyContainer.style.backgroundColor = "";
                 bodyContainer.style.overflow = "";
+
+                location.reload();
             } else {
                 errorInModal.style.display = "block";   // afficher le message d'erreur
             }
@@ -633,6 +635,8 @@ async function addImageApi(event) {
         boiteModale.setAttribute("aria-hidden", "true");
         bodyContainer.style.backgroundColor = "";
         bodyContainer.style.overflow = "";
+
+        location.reload();
     } catch (error) {
         console.error("Erreur complète:", {
             message: error.message,
