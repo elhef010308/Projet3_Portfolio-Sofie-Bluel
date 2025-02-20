@@ -9,15 +9,14 @@ titlePortfolioContainer.setAttribute("class", "title-portfolio");
 
 let galleryItems= [];
 
-let filteredItems = [];
-
-const bodyContainer = document.body;
+const bodyContainer = document.body;  
 
 const listItemsLi = document.querySelectorAll("li");
 const buttonLogin = listItemsLi[2];  
-const buttonProjet = listItemsLi[0];  
+const buttonProjet = listItemsLi[0];
 
 const barreModeEdition = document.getElementById("edition-mode-bar");
+const containerModalLink = document.querySelector(".icone-link-container");
 
 const formContainer = document.querySelector("#login-container form");
 const emailInput = document.getElementById("e-mail");
@@ -106,8 +105,10 @@ async function newFilters() {
         buttonContainer.appendChild(buttonFilters);
     });
 
-    portfolioContainer.insertBefore(buttonContainer, titlePortfolioContainer.nextElementSibling);
+    portfolioContainer.insertBefore(buttonContainer, galleryContainer);
 }
+
+let filteredItems = [];
 
 
 // FONCTION POUR : trier la galerie selon le clic sur les boutons
@@ -210,7 +211,9 @@ async function formResponse () {
                 document.getElementById("login-container").style.display = "none";
                 document.querySelector("main").style.display = "block";
 
+                // Mettre à jour l'interface visuelle
                 barreModeEdition.style.display = "flex";
+                containerModalLink.style.display = "flex";
                 
                 buttonLogin.textContent = "Déconnexion";       // remplacer "login" par "déconnexion"
                 buttonLogin.addEventListener("click", logout); // ajouter un écouteur d'événement pour la déconnexion
@@ -232,13 +235,16 @@ async function formResponse () {
 function logout() {
     localStorage.removeItem("token");           // supprimer le token
     barreModeEdition.style.display = "none";    // masquer la barre noire
-
+    containerModalLink.style.display = "none";  // masquer le lien MODIFIER
+ 
     buttonLogin.textContent = "Login";  
  
     buttonLogin.removeEventListener("click", logout);   // supprimer l'évènement "déconnexion"
 
     document.getElementById("login-container").style.display = "none";
     document.querySelector("main").style.display = "block";
+
+    location.reload();
 }
 
 
@@ -248,79 +254,19 @@ window.addEventListener("load", () => {
 
     if (token) { // Si l'utilisateur est connecté
         document.getElementById("edition-mode-bar").style.display = "flex";  // Afficher la barre noire
+        containerModalLink.style.display = "flex";
         const listItemsLi = document.querySelectorAll("li");
         const buttonLogin = listItemsLi[2];
         buttonLogin.textContent = "Déconnexion";        // Remplacer "Login" par "Déconnexion"
         buttonLogin.addEventListener("click", logout);  // Ajouter l'écouteur de déconnexion
     } else { // S'il ne l'est pas
         document.getElementById("edition-mode-bar").style.display = "none";  // Masquer la barre noire
+        containerModalLink.style.display = "none";
         const listItemsLi = document.querySelectorAll("li");
         const buttonLogin = listItemsLi[2];
         buttonLogin.textContent = "Login";  // Remplacer "Déconnexion" par "Login"
     }
 });
-
-
-
-// FONCTION POUR : créer le lien pour ouvrir la boite modale
-function createModalLink() {
-    // ÉTAPE 1 : créer le lien et l'icone pour ouvrir la modale
-    const modalLink = document.createElement("a");
-    modalLink.textContent = "modifier";
-    modalLink.setAttribute("id", "link-to-open-modal");
-    modalLink.setAttribute("href", "#modal-box-container");
-    modalLink.setAttribute("class", "link-to-open-modal-box");
-
-    const iconeLink1 = document.createElement("link");
-    iconeLink1.setAttribute("rel", "stylesheet");
-    iconeLink1.setAttribute("href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-    document.head.appendChild(iconeLink1);
-
-    const iconeModalLink = document.createElement("i");
-    iconeModalLink.setAttribute("class", "fa-regular fa-pen-to-square");
-
-    // ÉTAPE 2 : créer une div contenant l'icone et le lien 
-    const iconeLinkContainer = document.createElement("div");
-    iconeLinkContainer.setAttribute("class", "icone-link-container");
-
-    iconeLinkContainer.appendChild(iconeModalLink);
-    iconeLinkContainer.appendChild(modalLink);
-
-    // ÉTAPE 3 : créer une div pour contenir la div du lien et le titre de la section portfolio
-    const modalLinkContainer = document.createElement("div");
-    modalLinkContainer.setAttribute("class", "container-modalLink");
-
-    modalLinkContainer.appendChild(titlePortfolioContainer);
-    modalLinkContainer.appendChild(iconeLinkContainer);
-
-    // ÉTAPE 5 : insérer le lien au début de la section portfolio
-    const buttonContainer = document.querySelector(".list-buttons-filters");
-    portfolioContainer.insertBefore(modalLinkContainer, buttonContainer);
-
-    // ÉTAPE 6 : ajouter le style CSS
-    titlePortfolioContainer.style.display = "flex";
-    titlePortfolioContainer.style.alignItems = "center";
-    titlePortfolioContainer.style.margin = "50px 0 0 0";   
-    titlePortfolioContainer.style.padding = "0";            
-    
-    modalLink.style.color = "black";
-    modalLink.style.textDecoration = "none";
-    modalLink.style.fontSize = "14px";
-
-    iconeLinkContainer.style.display = "flex";
-    iconeLinkContainer.style.alignItems = "center"; 
-    iconeLinkContainer.style.justifyContent = "center";
-    iconeLinkContainer.style.gap = "10px";
-    iconeLinkContainer.style.width = "85px";
-    iconeLinkContainer.style.height = "18px";
-    iconeLinkContainer.style.margin = "50px 0 0 0";
-    iconeLinkContainer.style.gap = "15px";
-
-    modalLinkContainer.style.display = "flex";
-    modalLinkContainer.style.alignItems = "center"; 
-    modalLinkContainer.style.justifyContent = "center";
-    modalLinkContainer.style.gap = "30px";
-}
 
 
 // FONCTION POUR : gérer les boites modales
@@ -738,12 +684,10 @@ function resizeImage(file, maxWidth = 700, maxHeight = 700, quality = 0.7) {
 }
 
 
-
 fetchWorks().then(() => {
     addElement(galleryItems);
     newFilters();
     setButtonListener();
-    createModalLink();     // générer le lien pour ouvrir la boite modale
     picturesModalBox();    // ajouter les images à la boite modale
     gestionModalBox();
     addPictutesInModal();

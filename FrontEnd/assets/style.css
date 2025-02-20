@@ -429,6 +429,35 @@ li, button, a {
 	background-color: #1D6154;
 }
 
+/* Lien pour ouvrir les boites modales */
+.link-to-open-modal-box {
+	color: black;
+	text-decoration: none;
+	font-size: 14px;
+}
+
+.icone-link-container {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 15px;
+	width: 85px;
+	height: 18px;
+	margin: 30px 0 0 0;
+}
+
+.container-modalLink {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 30px;
+}
+
+.title-portfolio {
+	margin: 30px 0 0 0;
+	padding:30px 0 0 0;
+}
+
 /* les boites modales*/
 .modal-box-1, .modal-box-2 {
 	display: none; 
